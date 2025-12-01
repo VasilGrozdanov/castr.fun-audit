@@ -1,0 +1,9 @@
+SetNewLockerFactoryIntegrationConcreteTest
+├── When caller is not owner
+│   └── It should revert with {OwnableUnauthorizedAccount}
+└── When caller is owner
+    ├── When the new locker factory is the zero address
+    │   └── It should revert with {ZeroAddress}
+    └── When the new locker factory is not the zero address
+        ├── It should set the new locker factory
+        └── It should emit a {NewLockerFactorySet} event

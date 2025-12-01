@@ -1,0 +1,879 @@
+{
+    "abi": [
+        {
+            "type": "function",
+            "name": "createPoolAndLockLiquidity",
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "address",
+                    "internalType": "address payable"
+                },
+                {
+                    "name": "amountToAdd",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "tokenId",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "liquidity",
+                    "type": "uint128",
+                    "internalType": "uint128"
+                },
+                {
+                    "name": "amount0",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "amount1",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "locker",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "payable"
+        },
+        {
+            "type": "function",
+            "name": "getBondingCurveStorage",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getFeeAccount",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getLiquidityLocker",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "contract ILiquidityLocker"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getWeth",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "contract IWETH9"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "getWethAddress",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "nonfungiblePositionManager",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "contract INonfungiblePositionManager"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "event",
+            "name": "LiquidityLocked",
+            "inputs": [
+                {
+                    "name": "locker",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "tokenId",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "PoolCreated",
+            "inputs": [
+                {
+                    "name": "pool",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "token0",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "token1",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "tick",
+                    "type": "int24",
+                    "indexed": false,
+                    "internalType": "int24"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "sqrtPriceX96",
+                    "type": "uint160",
+                    "indexed": false,
+                    "internalType": "uint160"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "PoolMigrated",
+            "inputs": [
+                {
+                    "name": "pool",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "token",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "tokenId",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "locker",
+                    "type": "address",
+                    "indexed": false,
+                    "internalType": "address"
+                },
+                {
+                    "name": "amount0",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "amount1",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "liquidity",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "error",
+            "name": "LiquidityMigrator__NotBondingCurve",
+            "inputs": []
+        },
+        {
+            "type": "error",
+            "name": "LiquidityMigrator__TransferFailed",
+            "inputs": []
+        }
+    ],
+    "bytecode": {
+        "object": "0x",
+        "sourceMap": "",
+        "linkReferences": {}
+    },
+    "deployedBytecode": {
+        "object": "0x",
+        "sourceMap": "",
+        "linkReferences": {}
+    },
+    "methodIdentifiers": {
+        "createPoolAndLockLiquidity(address,uint256)": "2b436ab0",
+        "getBondingCurveStorage()": "ed1aec4c",
+        "getFeeAccount()": "4614be9f",
+        "getLiquidityLocker()": "66a10368",
+        "getWeth()": "107c279f",
+        "getWethAddress()": "23a7b42a",
+        "nonfungiblePositionManager()": "b44a2722"
+    },
+    "rawMetadata": "{\"compiler\":{\"version\":\"0.8.22+commit.4fc1097e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"LiquidityMigrator__NotBondingCurve\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"LiquidityMigrator__TransferFailed\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"locker\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"LiquidityLocked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"pool\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"token0\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"token1\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"int24\",\"name\":\"tick\",\"type\":\"int24\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint160\",\"name\":\"sqrtPriceX96\",\"type\":\"uint160\"}],\"name\":\"PoolCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"pool\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"locker\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount0\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount1\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"liquidity\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"PoolMigrated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountToAdd\",\"type\":\"uint256\"}],\"name\":\"createPoolAndLockLiquidity\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"uint128\",\"name\":\"liquidity\",\"type\":\"uint128\"},{\"internalType\":\"uint256\",\"name\":\"amount0\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount1\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"locker\",\"type\":\"address\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBondingCurveStorage\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getFeeAccount\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLiquidityLocker\",\"outputs\":[{\"internalType\":\"contract ILiquidityLocker\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getWeth\",\"outputs\":[{\"internalType\":\"contract IWETH9\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getWethAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nonfungiblePositionManager\",\"outputs\":[{\"internalType\":\"contract INonfungiblePositionManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Interface for a Aerodrome Concentrated Liquidity migrator. It handles the creation of Aerodrome Concentrated Liquidity pools, adding liquidity, and locking liquidity in the UNCX liquidity locker. This interface defines the functions and events related to creating pools,adding and locking liquidity.\",\"kind\":\"dev\",\"methods\":{\"createPoolAndLockLiquidity(address,uint256)\":{\"details\":\"The pool is created with a fixed tick spacing, that is stored in this contract. Call tickSpacing() to get the current value (e.g. 2000 = 1%). 1% is the maximum fee tier supported. Check the Aerodrome Concentrated Liquidity Pool documentation for more details on fee tiers and tick spacing.This function can be called only by the bonding curve of the respective token.\",\"params\":{\"amountToAdd\":\"The amount of the token to add to the pool.\",\"token\":\"The address of the token to be added in the pair.\"},\"returns\":{\"amount0\":\"The amount of the first token added to the pool.\",\"amount1\":\"The amount of the second token added to the pool.\",\"liquidity\":\"The amount of liquidity for this position.\",\"locker\":\"The Locker created for the liquidity (See ICLLocker for more details).\",\"tokenId\":\"The NFT ID of the created pool liquidity position.\"}},\"getBondingCurveStorage()\":{\"details\":\"The BondingCurveStorage contract is a central contract that holds all the bonding curves and related data.\",\"returns\":{\"_0\":\"The address of the BondingCurveStorage contract.\"}},\"getFeeAccount()\":{\"details\":\"The FeeAccount contract is responsible for managing the fees collected from the Aerodrome Concentrated Liquidity pools and the bonding curves.\",\"returns\":{\"_0\":\"The address of the FeeAccount contract.\"}},\"getLiquidityLocker()\":{\"details\":\"The licquidity locker contract is used to lock liquidity and eventually migrate it to Aerodrome concentrated liquidity locker. See ICLLockerFactory for more details.\",\"returns\":{\"_0\":\"The address of the liquidity locker contract.\"}},\"getWeth()\":{\"details\":\"The WETH contract is used to wrap and unwrap Ether for liquidity operations.\",\"returns\":{\"_0\":\"The WETH contract instance.\"}},\"getWethAddress()\":{\"details\":\"The WETH address is used to wrap and unwrap Ether for liquidity operations.\",\"returns\":{\"_0\":\"The address of the WETH contract.\"}},\"nonfungiblePositionManager()\":{\"details\":\"The NonfungiblePositionManager contract is used to manage the liquidity positions in Aerodrome Concentrated Liquidity pools.\",\"returns\":{\"_0\":\"The instance of the NonfungiblePositionManager contract.\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"createPoolAndLockLiquidity(address,uint256)\":{\"notice\":\"Creates a new Aerodrome Concentrated Liquidity pool for the specified token (token/WETH pair) and token amount.\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/interfaces/ILiquidityMigrator.sol\":\"ILiquidityMigrator\"},\"evmVersion\":\"shanghai\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[\":@aerodrome-finance/contracts/=lib/contracts/contracts/\",\":@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/\",\":@ensdomains/=lib/slipstream/node_modules/@ensdomains/\",\":@forge-std/=lib/forge-std/\",\":@nomad-xyz/=lib/slipstream/lib/ExcessivelySafeCall/\",\":@opengsn/=lib/contracts/lib/gsn/packages/\",\":@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/\",\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":@prb/math/=lib/prb-math/src/\",\":@solidity-parser/=lib/slipstream/node_modules/solhint/node_modules/@solidity-parser/\",\":@uncx-network/contracts/=lib/liquidity-locker-univ3-contracts/contracts/\",\":@uniswap/swap-router-contracts/=lib/swap-router-contracts/\",\":@uniswap/v3-core/=lib/v3-core/\",\":@uniswap/v3-periphery/=lib/v3-periphery/\",\":@velodrome-finance/pool-launcher/=lib/pool-launcher/src/\",\":@velodrome-finance/slipstream/=lib/slipstream/contracts/\",\":ExcessivelySafeCall/=lib/slipstream/lib/ExcessivelySafeCall/src/\",\":base64-sol/=lib/slipstream/lib/base64/\",\":base64/=lib/slipstream/lib/base64/\",\":chainlink-brownie-contracts/=lib/chainlink-brownie-contracts/\",\":contracts/=lib/contracts/contracts/\",\":createX/=lib/pool-launcher/lib/createX/src/\",\":ds-test/=lib/contracts/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":foundry-devops/=lib/foundry-devops/\",\":gsn/=lib/contracts/lib/\",\":halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/\",\":hardhat/=lib/slipstream/node_modules/hardhat/\",\":liquidity-locker-univ3-contracts/=lib/liquidity-locker-univ3-contracts/\",\":openzeppelin-contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\",\":openzeppelin/=lib/pool-launcher/lib/createX/lib/openzeppelin-contracts/contracts/\",\":pool-launcher/=lib/pool-launcher/\",\":prb-math/=lib/prb-math/src/\",\":slipstream/=lib/slipstream/\",\":solady/=lib/pool-launcher/lib/createX/lib/solady/src/\",\":solidity-lib/=lib/slipstream/lib/solidity-lib/contracts/\",\":swap-router-contracts/=lib/swap-router-contracts/contracts/\",\":utils/=lib/contracts/test/utils/\",\":v3-core/=lib/v3-core/\",\":v3-periphery/=lib/v3-periphery/contracts/\"]},\"sources\":{\"lib/openzeppelin-contracts/contracts/proxy/Clones.sol\":{\"keccak256\":\"0xf55d01dac75cffdabec6833a79bf3be0c108fc0db10e273daf7adfd3e9e59dae\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://540002a50a2a1a2b9dafffb976178e55adbf8d3a28db462c69f996921479c6b0\",\"dweb:/ipfs/QmQNAFyMf2FW3U1giM4Yej3zzd1pnxMtAA5GoADj4hTYYD\"]},\"lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0xe06a3f08a987af6ad2e1c1e774405d4fe08f1694b67517438b467cecf0da0ef7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://df6f0c459663c9858b6cba2cda1d14a7d05a985bed6d2de72bd8e78c25ee79db\",\"dweb:/ipfs/QmeTTxZ7qVk9rjEv2R4CpCwdf8UMCcRqDNMvzNxHc3Fnn9\"]},\"lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol\":{\"keccak256\":\"0x5dc63d1c6a12fe1b17793e1745877b2fcbe1964c3edfd0a482fac21ca8f18261\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6b7f97c5960a50fd1822cb298551ffc908e37b7893a68d6d08bce18a11cb0f11\",\"dweb:/ipfs/QmQQvxBytoY1eBt3pRQDmvH2hZ2yjhs12YqVfzGm7KSURq\"]},\"lib/openzeppelin-contracts/contracts/token/ERC721/extensions/IERC721Enumerable.sol\":{\"keccak256\":\"0x3d6954a93ac198a2ffa384fa58ccf18e7e235263e051a394328002eff4e073de\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://1f58c799bd939d3951c94893e83ef86acd56989d1d7db7f9d180c515e29e28ff\",\"dweb:/ipfs/QmTgAxHAAys4kq9ZfU9YB24MWYoHLGAKSxnYUigPFrNW7g\"]},\"lib/openzeppelin-contracts/contracts/token/ERC721/extensions/IERC721Metadata.sol\":{\"keccak256\":\"0x37d1aaaa5a2908a09e9dcf56a26ddf762ecf295afb5964695937344fc6802ce1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ed0bfc1b92153c5000e50f4021367b931bbe96372ac6facec3c4961b72053d02\",\"dweb:/ipfs/Qmbwp8VDerjS5SV1quwHH1oMXxPQ93fzfLVqJ2RCqbowGE\"]},\"lib/openzeppelin-contracts/contracts/utils/Errors.sol\":{\"keccak256\":\"0x6afa713bfd42cf0f7656efa91201007ac465e42049d7de1d50753a373648c123\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ba1d02f4847670a1b83dec9f7d37f0b0418d6043447b69f3a29a5f9efc547fcf\",\"dweb:/ipfs/QmQ7iH2keLNUKgq2xSWcRmuBE5eZ3F5whYAkAGzCNNoEWB\"]},\"lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol\":{\"keccak256\":\"0x79796192ec90263f21b464d5bc90b777a525971d3de8232be80d9c4f9fb353b8\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f6fda447a62815e8064f47eff0dd1cf58d9207ad69b5d32280f8d7ed1d1e4621\",\"dweb:/ipfs/QmfDRc7pxfaXB2Dh9np5Uf29Na3pQ7tafRS684wd3GLjVL\"]},\"lib/slipstream/contracts/core/interfaces/ICLFactory.sol\":{\"keccak256\":\"0xd67112fa19e66719d3a09b0d4ee256719590b6b016ecbe838da7d1bbafd2c8c3\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://3b7d153bf05cce1ccbc864c33ccf8be7733e7f23a23a56f73e480f96113ba0c7\",\"dweb:/ipfs/Qmax7Uk91VcFeLdZRAdjrJjdR58aNPQM72thRHHiY4spMM\"]},\"lib/slipstream/contracts/core/interfaces/ICLPool.sol\":{\"keccak256\":\"0x0a11e1392c4b5ef4e47a3415a9b1a2118e9370d52a253dbd1c910bbbb615e91f\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://0c04e689e0589f3d67961fd5febcdc0f39c0700aeebef2537ccfb29ddba29de1\",\"dweb:/ipfs/QmbuthGhVJsx45dpgF7p71VSuLshREAsaLJu34HQNgRJoz\"]},\"lib/slipstream/contracts/core/interfaces/IFactoryRegistry.sol\":{\"keccak256\":\"0x2216327aa103e9c6b0b995e3da244ec640004c5d03503491b0386bd1e4a29d18\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://9648484fd29f063d5bd9f403df035ffa073b3d67dd75f1d9890652bb669bf99b\",\"dweb:/ipfs/QmVdngtRwMnGr97GnzfDDvXvr7Qr2WSxtieKtrXaTLKYfn\"]},\"lib/slipstream/contracts/core/interfaces/IVoter.sol\":{\"keccak256\":\"0xb0a09a7dff77b1d50271da92205d54c424d231c9da46f00953e7e6010552d793\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0a0675a0638014e5dc8ebd9af09092cad27b3667353d1305eb224d6206af5d3f\",\"dweb:/ipfs/QmZq5wTf638VAYCdQWd48uvsgDdPLjddF363CaY36SoF8Y\"]},\"lib/slipstream/contracts/core/interfaces/IVotingEscrow.sol\":{\"keccak256\":\"0x7ca134004e6aba472210df0f4c9aea538ba1c99ec4b650f757c854fb21e2352d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://077dd08bba2faacc2ff6079c6b43c34f8b0df27d8af845baaa909e60edf6a691\",\"dweb:/ipfs/QmQrPbvWzZPq5kQzEoK6wXM2DLn2b6UWRiZYBfy3vrtahR\"]},\"lib/slipstream/contracts/core/interfaces/pool/ICLPoolActions.sol\":{\"keccak256\":\"0x7699f31261ab40982e34febe16128f1edfdad39075969195301352ea66bcac40\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://074f1c470e11f30d0fae8b95b963c9d19dcbd2c5bd17ad4ebba95c5f0f073044\",\"dweb:/ipfs/QmdDWMUspgBXfLhcxqESez9rSwA8JYNRycmhkhuKoDCWqJ\"]},\"lib/slipstream/contracts/core/interfaces/pool/ICLPoolConstants.sol\":{\"keccak256\":\"0xfad00d4ca1a40ef27d9614a98483ca67c4491b6f19e376901745c57a6949b512\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://2b5ea522565efb803d146673ff9e37aa090a5abff334fea587da62f4fb5d6647\",\"dweb:/ipfs/QmVRPscHFVjYFvRbJf41zVLtA2jVLbEUH66KGtEzspXnWS\"]},\"lib/slipstream/contracts/core/interfaces/pool/ICLPoolDerivedState.sol\":{\"keccak256\":\"0x146174cb3d58cfd3aeecff70b912b29e4f03042efd318c02f5675b1ce56b2f3f\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://ca3f1b52eff4aae26021bda335bb48475337fce2a3d47a3dcaf41ee7dc422001\",\"dweb:/ipfs/QmYPSKyC6i1K3yc6DUHAqUg395tgmZhaiT3znRGkeHkh9B\"]},\"lib/slipstream/contracts/core/interfaces/pool/ICLPoolEvents.sol\":{\"keccak256\":\"0x32fbcac8952f1c5c44b466b0e1c28634ce71372c0f65242aa0d821cebdddcc2b\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://19f22382292967f97640f84a7edfa01cf7deb303bf882344b9985007f1dcbef2\",\"dweb:/ipfs/Qmej7vWwun9fRBCrcvzPHdZP1jtLSCxJtjTSdkVTcgWeAE\"]},\"lib/slipstream/contracts/core/interfaces/pool/ICLPoolOwnerActions.sol\":{\"keccak256\":\"0xeafd14ae3e15c9f663507e004c599618bfd5d2a90d58b3b450f9372f9e3f54f8\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://49472c8cf06dc7084e22fc57ffdce860aa7a9ff77f12e4bef0c13a078bbc5831\",\"dweb:/ipfs/Qmd29vWULezsJJzhw3wZxsU6Hsng5949v2TiVCbdga4Vqe\"]},\"lib/slipstream/contracts/core/interfaces/pool/ICLPoolState.sol\":{\"keccak256\":\"0xe57d65825a097d6f0ab55d7ae39b528695b3df65320ed524124fbb55949bfcf9\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://b63b25beebe612acfd564f40b0d95b3844ee71bf969a3357419e7a54f1ece961\",\"dweb:/ipfs/Qmdk3mNLz3cSZscbXFsJp69gjgxFcBv6K5mdc6tjnmtFSR\"]},\"lib/slipstream/contracts/periphery/interfaces/IERC4906.sol\":{\"keccak256\":\"0x7f2a5bb13ad10ab0bf78eac6dd4e4485e0012a14287ed13743abe25b236bc4f3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a6c4d62ab63f862139f71fab6acdb1db8e573b5001269aa2f45e0640a7150177\",\"dweb:/ipfs/QmRUZBohDPULHayH9esCin8Pa4fa6BLCcBhpwvJ46836dT\"]},\"lib/slipstream/contracts/periphery/interfaces/IERC721Permit.sol\":{\"keccak256\":\"0xe588eef70286efb8a8d3135ba0784570cf339f39f24070a5f1216e72b0e80fbd\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://f4c725207fc34d281bc9962f1c4554fd08048a2f7ecd9416230ef45cb438dd73\",\"dweb:/ipfs/QmZw4PKyk71C2oMiCCQX8QpuK8o7ABtwXxtwVCtPVs1ujx\"]},\"lib/slipstream/contracts/periphery/interfaces/INonfungiblePositionManager.sol\":{\"keccak256\":\"0x74e7243217a3c8ba41a9c6b6b10900cf3a00dc1a3f95bd04081427c7c01f83a8\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://e33e1e1703929aedd9d796f099086c0d9ff84a6a3c24d3a8f18e9d8edb94e7d6\",\"dweb:/ipfs/QmTgZjt7UkimXb93xV16jFuAaaUsg5w5fJzdoGRgT5FeYN\"]},\"lib/slipstream/contracts/periphery/interfaces/IPeripheryImmutableState.sol\":{\"keccak256\":\"0x2600d1ad133e6e6f490119db13d0b80486489190e23c88fe9dccbc5221e3e1b9\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://8fb2b1081dd677835a575e72f77beabb3a9b34be4d800eeec5a06bc4be717ade\",\"dweb:/ipfs/QmS1KvRJy3hHct6CEqo8krZaGcshry2XKKJXsQUdQhwARv\"]},\"lib/slipstream/contracts/periphery/interfaces/IPeripheryPayments.sol\":{\"keccak256\":\"0xa8254ccb471e0abd1d296464779fb690cec6bc72586d24eaf073a8fd3601a803\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://c7593c3deed8a3362cdd8a63e77406060fb759644a9a6389ff65e0ebe8852d6f\",\"dweb:/ipfs/QmRFuFpTBTbJoGYeFXJuJLak5E9PrNKwUnrwkr5q7TTfmU\"]},\"lib/slipstream/contracts/periphery/libraries/PoolAddress.sol\":{\"keccak256\":\"0xa7759592956ec0231193fe6aec99f85949a53d38303de6464d7d07fd5b798974\",\"license\":\"GPL-2.0-or-later\",\"urls\":[\"bzz-raw://a5da7a6ada39f9d852d4e8953e18b16bd54639c1acd4f7b1d5572b2bba2098e6\",\"dweb:/ipfs/QmP7s8K3XAc3zKgF2MzQsjpqDMh3U1UcBR6bkSKzms7SPR\"]},\"src/interfaces/ILiquidityLocker.sol\":{\"keccak256\":\"0xbe4d8eade5726716f27d03d0a4aa07c27c10c8520bf269df73bea8e66d9a0499\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://65547756b741ccd60bd2bff5a9b5fc6692796a91d4cc09510b45632d8d636a3f\",\"dweb:/ipfs/QmeeBgWGZ5vnvTBFWNmf2iEAJGn1BpQSUcxhyHnWYBvjYj\"]},\"src/interfaces/ILiquidityMigrator.sol\":{\"keccak256\":\"0x096acda7cebc441850d5e40cd8548ea4eaf7f19c8a58a085181bc9a7b6ca7fe6\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8a8178649f58760a5b655fb703830effffc694e87044bdc0a126b7bb3df24c0f\",\"dweb:/ipfs/QmUPRmm2A2zfuqSSJf4UWUECYctWx9PHw8N7H3jT66h4Zm\"]}},\"version\":1}",
+    "metadata": {
+        "compiler": {
+            "version": "0.8.22+commit.4fc1097e"
+        },
+        "language": "Solidity",
+        "output": {
+            "abi": [
+                {
+                    "inputs": [],
+                    "type": "error",
+                    "name": "LiquidityMigrator__NotBondingCurve"
+                },
+                {
+                    "inputs": [],
+                    "type": "error",
+                    "name": "LiquidityMigrator__TransferFailed"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "locker",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256",
+                            "indexed": false
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "timestamp",
+                            "type": "uint256",
+                            "indexed": false
+                        }
+                    ],
+                    "type": "event",
+                    "name": "LiquidityLocked",
+                    "anonymous": false
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "pool",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "token0",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "token1",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "int24",
+                            "name": "tick",
+                            "type": "int24",
+                            "indexed": false
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "timestamp",
+                            "type": "uint256",
+                            "indexed": false
+                        },
+                        {
+                            "internalType": "uint160",
+                            "name": "sqrtPriceX96",
+                            "type": "uint160",
+                            "indexed": false
+                        }
+                    ],
+                    "type": "event",
+                    "name": "PoolCreated",
+                    "anonymous": false
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "pool",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "token",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256",
+                            "indexed": false
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "locker",
+                            "type": "address",
+                            "indexed": false
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amount0",
+                            "type": "uint256",
+                            "indexed": false
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amount1",
+                            "type": "uint256",
+                            "indexed": false
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "liquidity",
+                            "type": "uint256",
+                            "indexed": false
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "timestamp",
+                            "type": "uint256",
+                            "indexed": false
+                        }
+                    ],
+                    "type": "event",
+                    "name": "PoolMigrated",
+                    "anonymous": false
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address payable",
+                            "name": "token",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amountToAdd",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "payable",
+                    "type": "function",
+                    "name": "createPoolAndLockLiquidity",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint128",
+                            "name": "liquidity",
+                            "type": "uint128"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amount0",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amount1",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "locker",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "getBondingCurveStorage",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "getFeeAccount",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "getLiquidityLocker",
+                    "outputs": [
+                        {
+                            "internalType": "contract ILiquidityLocker",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "getWeth",
+                    "outputs": [
+                        {
+                            "internalType": "contract IWETH9",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "getWethAddress",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "nonfungiblePositionManager",
+                    "outputs": [
+                        {
+                            "internalType": "contract INonfungiblePositionManager",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                }
+            ],
+            "devdoc": {
+                "kind": "dev",
+                "methods": {
+                    "createPoolAndLockLiquidity(address,uint256)": {
+                        "details": "The pool is created with a fixed tick spacing, that is stored in this contract. Call tickSpacing() to get the current value (e.g. 2000 = 1%). 1% is the maximum fee tier supported. Check the Aerodrome Concentrated Liquidity Pool documentation for more details on fee tiers and tick spacing.This function can be called only by the bonding curve of the respective token.",
+                        "params": {
+                            "amountToAdd": "The amount of the token to add to the pool.",
+                            "token": "The address of the token to be added in the pair."
+                        },
+                        "returns": {
+                            "amount0": "The amount of the first token added to the pool.",
+                            "amount1": "The amount of the second token added to the pool.",
+                            "liquidity": "The amount of liquidity for this position.",
+                            "locker": "The Locker created for the liquidity (See ICLLocker for more details).",
+                            "tokenId": "The NFT ID of the created pool liquidity position."
+                        }
+                    },
+                    "getBondingCurveStorage()": {
+                        "details": "The BondingCurveStorage contract is a central contract that holds all the bonding curves and related data.",
+                        "returns": {
+                            "_0": "The address of the BondingCurveStorage contract."
+                        }
+                    },
+                    "getFeeAccount()": {
+                        "details": "The FeeAccount contract is responsible for managing the fees collected from the Aerodrome Concentrated Liquidity pools and the bonding curves.",
+                        "returns": {
+                            "_0": "The address of the FeeAccount contract."
+                        }
+                    },
+                    "getLiquidityLocker()": {
+                        "details": "The licquidity locker contract is used to lock liquidity and eventually migrate it to Aerodrome concentrated liquidity locker. See ICLLockerFactory for more details.",
+                        "returns": {
+                            "_0": "The address of the liquidity locker contract."
+                        }
+                    },
+                    "getWeth()": {
+                        "details": "The WETH contract is used to wrap and unwrap Ether for liquidity operations.",
+                        "returns": {
+                            "_0": "The WETH contract instance."
+                        }
+                    },
+                    "getWethAddress()": {
+                        "details": "The WETH address is used to wrap and unwrap Ether for liquidity operations.",
+                        "returns": {
+                            "_0": "The address of the WETH contract."
+                        }
+                    },
+                    "nonfungiblePositionManager()": {
+                        "details": "The NonfungiblePositionManager contract is used to manage the liquidity positions in Aerodrome Concentrated Liquidity pools.",
+                        "returns": {
+                            "_0": "The instance of the NonfungiblePositionManager contract."
+                        }
+                    }
+                },
+                "version": 1
+            },
+            "userdoc": {
+                "kind": "user",
+                "methods": {
+                    "createPoolAndLockLiquidity(address,uint256)": {
+                        "notice": "Creates a new Aerodrome Concentrated Liquidity pool for the specified token (token/WETH pair) and token amount."
+                    }
+                },
+                "version": 1
+            }
+        },
+        "settings": {
+            "remappings": [
+                "@aerodrome-finance/contracts/=lib/contracts/contracts/",
+                "@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/",
+                "@ensdomains/=lib/slipstream/node_modules/@ensdomains/",
+                "@forge-std/=lib/forge-std/",
+                "@nomad-xyz/=lib/slipstream/lib/ExcessivelySafeCall/",
+                "@opengsn/=lib/contracts/lib/gsn/packages/",
+                "@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
+                "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+                "@prb/math/=lib/prb-math/src/",
+                "@solidity-parser/=lib/slipstream/node_modules/solhint/node_modules/@solidity-parser/",
+                "@uncx-network/contracts/=lib/liquidity-locker-univ3-contracts/contracts/",
+                "@uniswap/swap-router-contracts/=lib/swap-router-contracts/",
+                "@uniswap/v3-core/=lib/v3-core/",
+                "@uniswap/v3-periphery/=lib/v3-periphery/",
+                "@velodrome-finance/pool-launcher/=lib/pool-launcher/src/",
+                "@velodrome-finance/slipstream/=lib/slipstream/contracts/",
+                "ExcessivelySafeCall/=lib/slipstream/lib/ExcessivelySafeCall/src/",
+                "base64-sol/=lib/slipstream/lib/base64/",
+                "base64/=lib/slipstream/lib/base64/",
+                "chainlink-brownie-contracts/=lib/chainlink-brownie-contracts/",
+                "contracts/=lib/contracts/contracts/",
+                "createX/=lib/pool-launcher/lib/createX/src/",
+                "ds-test/=lib/contracts/lib/ds-test/src/",
+                "erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+                "forge-std/=lib/forge-std/src/",
+                "foundry-devops/=lib/foundry-devops/",
+                "gsn/=lib/contracts/lib/",
+                "halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/",
+                "hardhat/=lib/slipstream/node_modules/hardhat/",
+                "liquidity-locker-univ3-contracts/=lib/liquidity-locker-univ3-contracts/",
+                "openzeppelin-contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/",
+                "openzeppelin-contracts/=lib/openzeppelin-contracts/",
+                "openzeppelin/=lib/pool-launcher/lib/createX/lib/openzeppelin-contracts/contracts/",
+                "pool-launcher/=lib/pool-launcher/",
+                "prb-math/=lib/prb-math/src/",
+                "slipstream/=lib/slipstream/",
+                "solady/=lib/pool-launcher/lib/createX/lib/solady/src/",
+                "solidity-lib/=lib/slipstream/lib/solidity-lib/contracts/",
+                "swap-router-contracts/=lib/swap-router-contracts/contracts/",
+                "utils/=lib/contracts/test/utils/",
+                "v3-core/=lib/v3-core/",
+                "v3-periphery/=lib/v3-periphery/contracts/"
+            ],
+            "optimizer": {
+                "enabled": false,
+                "runs": 200
+            },
+            "metadata": {
+                "bytecodeHash": "ipfs"
+            },
+            "compilationTarget": {
+                "src/interfaces/ILiquidityMigrator.sol": "ILiquidityMigrator"
+            },
+            "evmVersion": "shanghai",
+            "libraries": {}
+        },
+        "sources": {
+            "lib/openzeppelin-contracts/contracts/proxy/Clones.sol": {
+                "keccak256": "0xf55d01dac75cffdabec6833a79bf3be0c108fc0db10e273daf7adfd3e9e59dae",
+                "urls": [
+                    "bzz-raw://540002a50a2a1a2b9dafffb976178e55adbf8d3a28db462c69f996921479c6b0",
+                    "dweb:/ipfs/QmQNAFyMf2FW3U1giM4Yej3zzd1pnxMtAA5GoADj4hTYYD"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol": {
+                "keccak256": "0xe06a3f08a987af6ad2e1c1e774405d4fe08f1694b67517438b467cecf0da0ef7",
+                "urls": [
+                    "bzz-raw://df6f0c459663c9858b6cba2cda1d14a7d05a985bed6d2de72bd8e78c25ee79db",
+                    "dweb:/ipfs/QmeTTxZ7qVk9rjEv2R4CpCwdf8UMCcRqDNMvzNxHc3Fnn9"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol": {
+                "keccak256": "0x5dc63d1c6a12fe1b17793e1745877b2fcbe1964c3edfd0a482fac21ca8f18261",
+                "urls": [
+                    "bzz-raw://6b7f97c5960a50fd1822cb298551ffc908e37b7893a68d6d08bce18a11cb0f11",
+                    "dweb:/ipfs/QmQQvxBytoY1eBt3pRQDmvH2hZ2yjhs12YqVfzGm7KSURq"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/token/ERC721/extensions/IERC721Enumerable.sol": {
+                "keccak256": "0x3d6954a93ac198a2ffa384fa58ccf18e7e235263e051a394328002eff4e073de",
+                "urls": [
+                    "bzz-raw://1f58c799bd939d3951c94893e83ef86acd56989d1d7db7f9d180c515e29e28ff",
+                    "dweb:/ipfs/QmTgAxHAAys4kq9ZfU9YB24MWYoHLGAKSxnYUigPFrNW7g"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/token/ERC721/extensions/IERC721Metadata.sol": {
+                "keccak256": "0x37d1aaaa5a2908a09e9dcf56a26ddf762ecf295afb5964695937344fc6802ce1",
+                "urls": [
+                    "bzz-raw://ed0bfc1b92153c5000e50f4021367b931bbe96372ac6facec3c4961b72053d02",
+                    "dweb:/ipfs/Qmbwp8VDerjS5SV1quwHH1oMXxPQ93fzfLVqJ2RCqbowGE"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/Errors.sol": {
+                "keccak256": "0x6afa713bfd42cf0f7656efa91201007ac465e42049d7de1d50753a373648c123",
+                "urls": [
+                    "bzz-raw://ba1d02f4847670a1b83dec9f7d37f0b0418d6043447b69f3a29a5f9efc547fcf",
+                    "dweb:/ipfs/QmQ7iH2keLNUKgq2xSWcRmuBE5eZ3F5whYAkAGzCNNoEWB"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol": {
+                "keccak256": "0x79796192ec90263f21b464d5bc90b777a525971d3de8232be80d9c4f9fb353b8",
+                "urls": [
+                    "bzz-raw://f6fda447a62815e8064f47eff0dd1cf58d9207ad69b5d32280f8d7ed1d1e4621",
+                    "dweb:/ipfs/QmfDRc7pxfaXB2Dh9np5Uf29Na3pQ7tafRS684wd3GLjVL"
+                ],
+                "license": "MIT"
+            },
+            "lib/slipstream/contracts/core/interfaces/ICLFactory.sol": {
+                "keccak256": "0xd67112fa19e66719d3a09b0d4ee256719590b6b016ecbe838da7d1bbafd2c8c3",
+                "urls": [
+                    "bzz-raw://3b7d153bf05cce1ccbc864c33ccf8be7733e7f23a23a56f73e480f96113ba0c7",
+                    "dweb:/ipfs/Qmax7Uk91VcFeLdZRAdjrJjdR58aNPQM72thRHHiY4spMM"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/core/interfaces/ICLPool.sol": {
+                "keccak256": "0x0a11e1392c4b5ef4e47a3415a9b1a2118e9370d52a253dbd1c910bbbb615e91f",
+                "urls": [
+                    "bzz-raw://0c04e689e0589f3d67961fd5febcdc0f39c0700aeebef2537ccfb29ddba29de1",
+                    "dweb:/ipfs/QmbuthGhVJsx45dpgF7p71VSuLshREAsaLJu34HQNgRJoz"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/core/interfaces/IFactoryRegistry.sol": {
+                "keccak256": "0x2216327aa103e9c6b0b995e3da244ec640004c5d03503491b0386bd1e4a29d18",
+                "urls": [
+                    "bzz-raw://9648484fd29f063d5bd9f403df035ffa073b3d67dd75f1d9890652bb669bf99b",
+                    "dweb:/ipfs/QmVdngtRwMnGr97GnzfDDvXvr7Qr2WSxtieKtrXaTLKYfn"
+                ],
+                "license": "MIT"
+            },
+            "lib/slipstream/contracts/core/interfaces/IVoter.sol": {
+                "keccak256": "0xb0a09a7dff77b1d50271da92205d54c424d231c9da46f00953e7e6010552d793",
+                "urls": [
+                    "bzz-raw://0a0675a0638014e5dc8ebd9af09092cad27b3667353d1305eb224d6206af5d3f",
+                    "dweb:/ipfs/QmZq5wTf638VAYCdQWd48uvsgDdPLjddF363CaY36SoF8Y"
+                ],
+                "license": "MIT"
+            },
+            "lib/slipstream/contracts/core/interfaces/IVotingEscrow.sol": {
+                "keccak256": "0x7ca134004e6aba472210df0f4c9aea538ba1c99ec4b650f757c854fb21e2352d",
+                "urls": [
+                    "bzz-raw://077dd08bba2faacc2ff6079c6b43c34f8b0df27d8af845baaa909e60edf6a691",
+                    "dweb:/ipfs/QmQrPbvWzZPq5kQzEoK6wXM2DLn2b6UWRiZYBfy3vrtahR"
+                ],
+                "license": "MIT"
+            },
+            "lib/slipstream/contracts/core/interfaces/pool/ICLPoolActions.sol": {
+                "keccak256": "0x7699f31261ab40982e34febe16128f1edfdad39075969195301352ea66bcac40",
+                "urls": [
+                    "bzz-raw://074f1c470e11f30d0fae8b95b963c9d19dcbd2c5bd17ad4ebba95c5f0f073044",
+                    "dweb:/ipfs/QmdDWMUspgBXfLhcxqESez9rSwA8JYNRycmhkhuKoDCWqJ"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/core/interfaces/pool/ICLPoolConstants.sol": {
+                "keccak256": "0xfad00d4ca1a40ef27d9614a98483ca67c4491b6f19e376901745c57a6949b512",
+                "urls": [
+                    "bzz-raw://2b5ea522565efb803d146673ff9e37aa090a5abff334fea587da62f4fb5d6647",
+                    "dweb:/ipfs/QmVRPscHFVjYFvRbJf41zVLtA2jVLbEUH66KGtEzspXnWS"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/core/interfaces/pool/ICLPoolDerivedState.sol": {
+                "keccak256": "0x146174cb3d58cfd3aeecff70b912b29e4f03042efd318c02f5675b1ce56b2f3f",
+                "urls": [
+                    "bzz-raw://ca3f1b52eff4aae26021bda335bb48475337fce2a3d47a3dcaf41ee7dc422001",
+                    "dweb:/ipfs/QmYPSKyC6i1K3yc6DUHAqUg395tgmZhaiT3znRGkeHkh9B"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/core/interfaces/pool/ICLPoolEvents.sol": {
+                "keccak256": "0x32fbcac8952f1c5c44b466b0e1c28634ce71372c0f65242aa0d821cebdddcc2b",
+                "urls": [
+                    "bzz-raw://19f22382292967f97640f84a7edfa01cf7deb303bf882344b9985007f1dcbef2",
+                    "dweb:/ipfs/Qmej7vWwun9fRBCrcvzPHdZP1jtLSCxJtjTSdkVTcgWeAE"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/core/interfaces/pool/ICLPoolOwnerActions.sol": {
+                "keccak256": "0xeafd14ae3e15c9f663507e004c599618bfd5d2a90d58b3b450f9372f9e3f54f8",
+                "urls": [
+                    "bzz-raw://49472c8cf06dc7084e22fc57ffdce860aa7a9ff77f12e4bef0c13a078bbc5831",
+                    "dweb:/ipfs/Qmd29vWULezsJJzhw3wZxsU6Hsng5949v2TiVCbdga4Vqe"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/core/interfaces/pool/ICLPoolState.sol": {
+                "keccak256": "0xe57d65825a097d6f0ab55d7ae39b528695b3df65320ed524124fbb55949bfcf9",
+                "urls": [
+                    "bzz-raw://b63b25beebe612acfd564f40b0d95b3844ee71bf969a3357419e7a54f1ece961",
+                    "dweb:/ipfs/Qmdk3mNLz3cSZscbXFsJp69gjgxFcBv6K5mdc6tjnmtFSR"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/periphery/interfaces/IERC4906.sol": {
+                "keccak256": "0x7f2a5bb13ad10ab0bf78eac6dd4e4485e0012a14287ed13743abe25b236bc4f3",
+                "urls": [
+                    "bzz-raw://a6c4d62ab63f862139f71fab6acdb1db8e573b5001269aa2f45e0640a7150177",
+                    "dweb:/ipfs/QmRUZBohDPULHayH9esCin8Pa4fa6BLCcBhpwvJ46836dT"
+                ],
+                "license": "MIT"
+            },
+            "lib/slipstream/contracts/periphery/interfaces/IERC721Permit.sol": {
+                "keccak256": "0xe588eef70286efb8a8d3135ba0784570cf339f39f24070a5f1216e72b0e80fbd",
+                "urls": [
+                    "bzz-raw://f4c725207fc34d281bc9962f1c4554fd08048a2f7ecd9416230ef45cb438dd73",
+                    "dweb:/ipfs/QmZw4PKyk71C2oMiCCQX8QpuK8o7ABtwXxtwVCtPVs1ujx"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/periphery/interfaces/INonfungiblePositionManager.sol": {
+                "keccak256": "0x74e7243217a3c8ba41a9c6b6b10900cf3a00dc1a3f95bd04081427c7c01f83a8",
+                "urls": [
+                    "bzz-raw://e33e1e1703929aedd9d796f099086c0d9ff84a6a3c24d3a8f18e9d8edb94e7d6",
+                    "dweb:/ipfs/QmTgZjt7UkimXb93xV16jFuAaaUsg5w5fJzdoGRgT5FeYN"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/periphery/interfaces/IPeripheryImmutableState.sol": {
+                "keccak256": "0x2600d1ad133e6e6f490119db13d0b80486489190e23c88fe9dccbc5221e3e1b9",
+                "urls": [
+                    "bzz-raw://8fb2b1081dd677835a575e72f77beabb3a9b34be4d800eeec5a06bc4be717ade",
+                    "dweb:/ipfs/QmS1KvRJy3hHct6CEqo8krZaGcshry2XKKJXsQUdQhwARv"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/periphery/interfaces/IPeripheryPayments.sol": {
+                "keccak256": "0xa8254ccb471e0abd1d296464779fb690cec6bc72586d24eaf073a8fd3601a803",
+                "urls": [
+                    "bzz-raw://c7593c3deed8a3362cdd8a63e77406060fb759644a9a6389ff65e0ebe8852d6f",
+                    "dweb:/ipfs/QmRFuFpTBTbJoGYeFXJuJLak5E9PrNKwUnrwkr5q7TTfmU"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "lib/slipstream/contracts/periphery/libraries/PoolAddress.sol": {
+                "keccak256": "0xa7759592956ec0231193fe6aec99f85949a53d38303de6464d7d07fd5b798974",
+                "urls": [
+                    "bzz-raw://a5da7a6ada39f9d852d4e8953e18b16bd54639c1acd4f7b1d5572b2bba2098e6",
+                    "dweb:/ipfs/QmP7s8K3XAc3zKgF2MzQsjpqDMh3U1UcBR6bkSKzms7SPR"
+                ],
+                "license": "GPL-2.0-or-later"
+            },
+            "src/interfaces/ILiquidityLocker.sol": {
+                "keccak256": "0xbe4d8eade5726716f27d03d0a4aa07c27c10c8520bf269df73bea8e66d9a0499",
+                "urls": [
+                    "bzz-raw://65547756b741ccd60bd2bff5a9b5fc6692796a91d4cc09510b45632d8d636a3f",
+                    "dweb:/ipfs/QmeeBgWGZ5vnvTBFWNmf2iEAJGn1BpQSUcxhyHnWYBvjYj"
+                ],
+                "license": "MIT"
+            },
+            "src/interfaces/ILiquidityMigrator.sol": {
+                "keccak256": "0x096acda7cebc441850d5e40cd8548ea4eaf7f19c8a58a085181bc9a7b6ca7fe6",
+                "urls": [
+                    "bzz-raw://8a8178649f58760a5b655fb703830effffc694e87044bdc0a126b7bb3df24c0f",
+                    "dweb:/ipfs/QmUPRmm2A2zfuqSSJf4UWUECYctWx9PHw8N7H3jT66h4Zm"
+                ],
+                "license": "MIT"
+            }
+        },
+        "version": 1
+    },
+    "id": 167
+}

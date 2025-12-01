@@ -1,0 +1,7 @@
+StakeIntegrationConcreteTest
+├── When the locker is staked
+│   └── It should revert with {AlreadyStaked}
+└── When the locker is not staked
+    ├── It should claim the fees
+    ├── It should deposit in the gauge
+    └── It should emit a {Staked} event

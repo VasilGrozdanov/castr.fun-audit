@@ -1,0 +1,19 @@
+{
+  "extends": "solhint:recommended",
+  "rules": {
+    "compiler-version": "off",
+    "func-visibility": ["warn", { "ignoreConstructors": true }],
+    "one-contract-per-file": "off",
+    "contract-name-capwords": "off",
+    "func-name-mixedcase": "off",
+    "no-empty-blocks": "off",
+    "avoid-low-level-calls": "off",
+    "no-inline-assembly": "off",
+    "max-states-count": "off",
+    "import-path-check": "off",
+    "gas-strict-inequalities": "off",
+    "function-max-lines": "off",
+    "gas-small-strings": "off",
+    "use-natspec": "off"
+  }
+}

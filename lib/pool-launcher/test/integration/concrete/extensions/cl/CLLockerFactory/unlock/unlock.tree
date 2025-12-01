@@ -1,0 +1,22 @@
+UnlockIntegrationConcreteTest
+├── When the recipient is the zero address
+│   └── It should revert with {ZeroAddress}
+└── When the recipient is not the zero address
+    ├── When the locker does not exist
+    │   └── It should revert with {NotLocker}
+    └── When the locker exists
+        ├── When the caller is not the locker owner
+        │   └── It should revert with {NotLockerOwner}
+        └── When the caller is the locker owner
+            ├── When the locker has not expired
+            │   └── It should revert with {Locked}
+            └── When the locker has expired
+                ├── When the locker is staked
+                │   └── It should revert with {Staked}
+                └── When the locker is not staked
+                    ├── It should claim the available fees
+                    ├── It should remove the locker from the instances mapping
+                    ├── It should remove the locker from the pool's set of lockers
+                    ├── It should unlock the locker
+                    ├── It should transfer the liquidity to the recipient
+                    └── It should emit a {LockerUnlocked} event

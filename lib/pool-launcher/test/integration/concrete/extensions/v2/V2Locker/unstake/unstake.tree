@@ -1,0 +1,7 @@
+UnstakeIntegrationConcreteTest
+├── When the locker is not staked
+│   └── It should revert with {NotStaked}
+└── When the locker is staked
+    ├── It should claim the rewards
+    ├── It should withdraw from the gauge
+    └── It should emit an {Unstaked} event

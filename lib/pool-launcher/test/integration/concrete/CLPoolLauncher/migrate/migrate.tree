@@ -1,0 +1,33 @@
+MigrateIntegrationConcreteTest
+├── When the new pool launcher is not set
+│   └── It should revert with {NewPoolLauncherNotSet}
+└── When the new pool launcher is set
+    ├── When the caller is not the locker owner
+    │   └── It should revert with {NotLockerOwner}
+    └── When the caller is the locker owner
+        ├── When the locker has expired
+        │   └── It should revert with {NotLocked}
+        └── When the locker has not expired
+            ├── When the underlying pool is not registered in pool launcher
+            │   └── It should revert with {PoolNotInPoolLauncher}
+            └── When the underlying pool is registered in pool launcher
+                ├── When the amounts to unlock are smaller than the amounts to migrate
+                │   └── It should revert with {InsufficientPoolLauncherUnlockMin}
+                └── When the amounts to unlock are greater than or equal to the amounts to migrate
+                    ├── When the amounts unlocked are smaller than the min amounts to unlock
+                    │   └── It should revert with {PS}
+                    └── When the amounts unlocked are greater than or equal to the min amounts to unlock
+                        ├── When the amounts migrated are smaller than the min amounts
+                        │   └── It should revert with {PSC}
+                        └── When the amounts migrated are greater than or equal to the min amounts
+                            ├── When the pool launcher token is token0
+                            │   ├── It should migrate the pool launcher pool to the new pool launcher
+                            │   ├── It should migrate the locker to the new locker factory
+                            │   ├── It should refund leftover to new locker
+                            │   └── It should emit a {Migrate} event
+                            └── When the pool launcher token is token1
+                                ├── It should sort the tokens
+                                ├── It should migrate the pool launcher pool to the new pool launcher
+                                ├── It should migrate the locker to the new locker factory
+                                ├── It should refund leftover to new locker
+                                └── It should emit a {Migrate} event

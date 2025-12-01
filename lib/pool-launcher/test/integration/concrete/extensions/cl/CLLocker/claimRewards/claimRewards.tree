@@ -1,0 +1,23 @@
+ClaimRewardsIntegrationConcreteTest
+├── When the locker is not staked
+│   └── It should revert with {NotStaked}
+└── When the locker is staked
+    ├── When the amount of rewards is zero
+    │   ├── It should keep the same locker balance
+    │   └── It should keep the same user balance
+    └── When the amount of rewards is greater than zero
+        ├── When the beneficiary is address zero
+        │   ├── It should claim from the gauge
+        │   ├── It should send the rewards to the recipient
+        │   └── It should emit a {RewardsClaimed} for the recipient
+        └── When the beneficiary is not address zero
+            ├── When beneficiary share is zero
+            │   ├── It should claim the rewards
+            │   ├── It should send the rewards to the recipient
+            │   └── It should emit a {RewardsClaimed} for the recipient
+            └── When the beneficiary share is greater than zero
+                ├── It should claim the rewards
+                ├── It should send a share to the beneficiary
+                ├── It should emit a {RewardsClaimed} for the beneficiary
+                ├── It should send the rewards to the recipient
+                └── It should emit a {RewardsClaimed} for the recipient

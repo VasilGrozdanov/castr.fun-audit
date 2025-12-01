@@ -1,0 +1,49 @@
+MigrateIntegrationConcreteTest
+├── When the new locker factory is not set
+│   └── It should revert with {MigrationDisabled}
+└── When the new locker factory is set
+    ├── When the locker does not exist
+    │   └── It should revert with {NotLocker}
+    └── When the locker exists
+        ├── When the caller is the pool launcher
+        │   ├── When the amounts to unlock are smaller than the amounts to migrate
+        │   │   └── It should revert with {InsufficientUnlockMin}
+        │   └── When the amounts to unlock are greater than or equal to the amounts to migrate
+        │       ├── When the amounts unlocked are smaller than the min amounts to unlock
+        │       │   └── It should revert with {PS}
+        │       └── When the amounts unlocked are greater than or equal to the min amounts to unlock
+        │           ├── It should remove the old locker instance from the factory
+        │           ├── It should update the liquidity for the underlying pool
+        │           ├── It should update the lock count for the underlying pool
+        │           ├── It should unlock the old locker and withdraw all liquidity to the pool launcher
+        │           ├── It should burn the old liquidity position
+        │           ├── It should return the unlocked token amounts
+        │           └── It should emit a {LockerUnlocked} event
+        └── When the caller is not the pool launcher
+            ├── When the caller is not the owner
+            │   └── It should revert with {NotLockerOwnerOrPoolLauncher}
+            └── When the caller is the owner
+                ├── When the locker is not locked
+                │   └── It should revert with {NotLocked}
+                └── When the locker is locked
+                    ├── When the amounts to unlock are smaller than the amounts to migrate_
+                    │   └── It should revert with {InsufficientUnlockMin}
+                    └── When the amounts to unlock are greater than or equal to the amounts to migrate_
+                        ├── When the amounts unlocked are smaller than the min amounts to unlock_
+                        │   └── It should revert with {PS}
+                        └── When the amounts unlocked are greater than or equal to the min amounts to unlock_
+                            ├── When the amounts migrated are smaller than the min amounts
+                            │   └── It should revert with {PSC}
+                            └── When the amounts migrated are greater than or equal to the min amounts
+                                ├── It should remove the old locker instance from the factory
+                                ├── It should update the liquidity for the underlying pool
+                                ├── It should update the lock count for the underlying pool
+                                ├── It should unlock the old locker and withdraw all liquidity
+                                ├── It should burn the old liquidity position
+                                ├── It should mint a liquidity position on the new deployment
+                                ├── It should refund any leftover tokens to the new locker
+                                ├── It should reset any outstanding allowances
+                                ├── It should lock the LP in an identical locker in the new factory
+                                ├── It should return the unlocked token amounts
+                                ├── It should emit a {LockerUnlocked} event
+                                └── It should emit a {LockerMigrated} event

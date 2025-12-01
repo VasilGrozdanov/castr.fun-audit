@@ -1,0 +1,29 @@
+MigrateUnitConcreteTest
+├── When the new locker factory is not set
+│   └── It should revert with {MigrationDisabled}
+└── When the new locker factory is set
+    ├── When the locker is not a valid instance
+    │   └── It should revert with {NotLocker}
+    └── When the locker is a valid instance
+        ├── When the caller is not the locker owner
+        │   └── It should revert with {NotLockerOwner}
+        └── When the caller is the locker owner
+            ├── When the locker has expired
+            │   └── It should revert with {NotLocked}
+            └── When the locker has not expired
+                ├── When the amounts to unlock are smaller than the amounts to migrate
+                │   └── It should revert with {InsufficientUnlockMin}
+                └── When the amounts to unlock are greater than or equal to the amounts to migrate
+                    ├── When the amounts unlocked are smaller than the min amounts to unlock
+                    │   └── It should revert with {InsufficientAmountUnlocked}
+                    └── When the amounts unlocked are greater than or equal to the min amounts to unlock
+                        ├── When the amounts migrated are smaller than the min amounts
+                        │   └── It should revert with {InsufficientAmount}
+                        └── When the amounts migrated are greater than or equal to the min amounts
+                            ├── It should decrease the locked amount stored in the factory
+                            ├── It should decrease the number of locks stored in the factory
+                            ├── It should remove the reference to the locker in the factory
+                            ├── It should migrate the locker to the new locker factory
+                            ├── It should refund any leftover tokens to the new locker
+                            ├── It should emit a {LockerUnlocked} event
+                            └── It should emit a {Migrate} event

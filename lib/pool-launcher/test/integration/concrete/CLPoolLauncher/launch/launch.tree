@@ -1,0 +1,42 @@
+LaunchIntegrationConcreteTest
+├── When the pool launcher token is whitelisted
+│   └── It should revert with {InvalidPoolLauncherToken}
+└── When the pool launcher token is not whitelisted
+    ├── When the pool has already been created
+    │   └── It should revert with {PoolAlreadyExists}
+    └── When the pool has not been created yet
+        ├── When the tokenToPair is not not whitelisted
+        │   └── It should revert with {InvalidToken}
+        └── When the tokenToPair is whitelisted
+            ├── When the tick for the initial price is outside the given range
+            │   └── It should revert with {InvalidSqrtPrice}
+            └── When the tick for the initial price is inside the given range
+                ├── When the amounts deposited are smaller than the min amounts
+                │   └── It should revert with {PSC}
+                └── When the the amounts deposited are greater than or equal to the min amounts
+                    ├── When lock duration is zero
+                    │   ├── It should create a new pool launcher pool
+                    │   ├── It should mint a liquidity position to the user
+                    │   ├── It should refund any leftover tokens to the user
+                    │   ├── It should reset any oustanding allowances
+                    │   ├── It should map the underlying pool to the pool parameters
+                    │   ├── It should store the info for the new pool in storage
+                    │   └── It should emit a {Launch} event
+                    ├── When lock duration is not zero or UINT32_MAX
+                    │   ├── It should create a new pool launcher pool
+                    │   ├── It should mint a liquidity position
+                    │   ├── It should lock the liquidity position in a new Locker for the given duration
+                    │   ├── It should refund any leftover tokens to the user
+                    │   ├── It should reset any oustanding allowances
+                    │   ├── It should map the underlying pool to the pool parameters
+                    │   ├── It should store the info for the new pool in storage
+                    │   └── It should emit a {Launch} event
+                    └── When lock duration is UINT32_MAX
+                        ├── It should create a new pool launcher pool
+                        ├── It should mint a liquidity position
+                        ├── It should permanently lock the liquidity position in a new Locker
+                        ├── It should refund any leftover tokens to the user
+                        ├── It should reset any oustanding allowances
+                        ├── It should map the underlying pool to the pool parameters
+                        ├── It should store the info for the new pool in storage
+                        └── It should emit a {Launch} event
