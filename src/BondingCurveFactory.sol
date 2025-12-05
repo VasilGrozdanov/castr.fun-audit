@@ -132,7 +132,11 @@ contract BondingCurveFactory is Ownable, IBondingCurveFactory {
 
         emit NewBondingCurveCreated(bondingCurveClone);
         if (msg.value > 0) {
-            IBondingCurve(bondingCurveClone).buyToken{value: msg.value}(0, id);
+            IBondingCurve(bondingCurveClone).buyTokenForDev{value: msg.value}(
+                dev,
+                0,
+                id
+            );
         }
 
         return bondingCurveClone;

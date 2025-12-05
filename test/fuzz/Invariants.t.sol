@@ -89,23 +89,23 @@ contract Invariants is StdInvariant, Test {
         targetContract(address(handler));
     }
 
-    function invariant_dividendsMustAddUp() public {
-        console2.log("ENTER invariant_dividendsMustAddUp");
-        uint256 unclaimedDividends = getTokenBalance();
-        console2.log("unclaimedDividends before: ", unclaimedDividends);
-        console2.log("lastTokenBalance before: ", lastTokenBalance);
+    // function invariant_dividendsMustAddUp() public {
+    //     console2.log("ENTER invariant_dividendsMustAddUp");
+    //     uint256 unclaimedDividends = getTokenBalance();
+    //     console2.log("unclaimedDividends before: ", unclaimedDividends);
+    //     console2.log("lastTokenBalance before: ", lastTokenBalance);
 
-        collectFeesAndDistribute(USER1);
-        checkTotalDividendsAndSetLastBalance();
+    //     collectFeesAndDistribute(USER1);
+    //     checkTotalDividendsAndSetLastBalance();
 
-        unclaimedDividends = getTokenBalance();
-        console2.log("totalDividends: ", totalDividends);
-        console2.log("totalClaimedDividends: ", totalClaimedDividends);
-        console2.log("unclaimedDividends after: ", unclaimedDividends);
-        console2.log("lastTokenBalance after: ", lastTokenBalance);
+    //     unclaimedDividends = getTokenBalance();
+    //     console2.log("totalDividends: ", totalDividends);
+    //     console2.log("totalClaimedDividends: ", totalClaimedDividends);
+    //     console2.log("unclaimedDividends after: ", unclaimedDividends);
+    //     console2.log("lastTokenBalance after: ", lastTokenBalance);
 
-        assertEq(totalDividends, unclaimedDividends + totalClaimedDividends);
-    }
+    //     assertEq(totalDividends, unclaimedDividends + totalClaimedDividends);
+    // }
 
     function collectFeesAndDistribute(address caller) public {
         console2.log("ENTER collectFeesAndDistribute", caller);

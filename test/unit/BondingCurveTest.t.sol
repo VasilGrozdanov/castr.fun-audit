@@ -90,7 +90,7 @@ contract BondingCurveTest is Test {
         );
         uint256 startingBalanceUser = address(USER).balance;
 
-        vm.prank(USER, USER);
+        vm.prank(USER);
         (bool success, ) = _sendEtherToCurve(START_AMOUNT);
 
         assertTrue(success);
@@ -101,6 +101,29 @@ contract BondingCurveTest is Test {
         );
         assertGt(address(bondingCurve).balance, startingBalanceBondingCurve);
         assertLt(address(USER).balance, startingBalanceUser);
+        assertGt(FEE_ACCOUNT.balance, 0);
+    }
+
+    function testBuyForDevOk() public {
+        uint256 startingBalanceBondingCurve = address(bondingCurve).balance;
+        uint256 startingTokenBalanceBondingCurve = burnableToken.balanceOf(
+            address(bondingCurve)
+        );
+        uint256 startingBalance = address(this).balance;
+        address factory = factoryManager.getBondingCurveFactory();
+        address dev = makeAddr("dev");
+
+        vm.deal(factory, START_AMOUNT);
+        vm.prank(factory);
+        bondingCurve.buyTokenForDev{value: START_AMOUNT}(dev, 0, ID);
+
+        assertGt(burnableToken.balanceOf(dev), 0);
+        assertEq(
+            burnableToken.balanceOf(address(bondingCurve)),
+            startingTokenBalanceBondingCurve - burnableToken.balanceOf(dev)
+        );
+        assertGt(address(bondingCurve).balance, startingBalanceBondingCurve);
+        assertLt(dev.balance, startingBalance);
         assertGt(FEE_ACCOUNT.balance, 0);
     }
 
@@ -116,7 +139,7 @@ contract BondingCurveTest is Test {
         vm.warp(block.timestamp + 24 hours);
         vm.roll(block.number + 1);
 
-        vm.startPrank(USER, USER);
+        vm.startPrank(USER);
         burnableToken.approve(address(bondingCurve), startingTokenBalanceUser);
         bondingCurve.sellToken(startingTokenBalanceUser, 0, ID);
         vm.stopPrank();
@@ -135,7 +158,7 @@ contract BondingCurveTest is Test {
         testBuyOk();
         uint256 startingTokenBalanceUser = burnableToken.balanceOf(USER);
 
-        vm.startPrank(USER, USER);
+        vm.startPrank(USER);
         burnableToken.approve(address(bondingCurve), startingTokenBalanceUser);
         vm.expectRevert(
             abi.encodeWithSelector(
@@ -153,7 +176,7 @@ contract BondingCurveTest is Test {
 
         vm.warp(block.timestamp + 24 hours);
         vm.roll(block.number + 1);
-        vm.startPrank(USER, USER);
+        vm.startPrank(USER);
         burnableToken.approve(address(bondingCurve), startingTokenBalanceUser);
         vm.expectRevert(
             IBondingCurve.BondingCurve__MinimumAmountNotMet.selector
@@ -165,12 +188,20 @@ contract BondingCurveTest is Test {
     function testBuyRevertsIfMinAmountNotMet() public {
         uint256 startingBalanceUser = address(USER).balance;
 
-        vm.prank(USER, USER);
+        vm.prank(USER);
         vm.expectRevert(
             IBondingCurve.BondingCurve__MinimumAmountNotMet.selector
         );
         bondingCurve.buyToken{value: START_AMOUNT}(type(uint256).max, ID);
-        vm.stopPrank();
+    }
+
+    function testBuyForDevRevertsIfNotFactory() public {
+        uint256 startingBalanceUser = address(USER).balance;
+
+        vm.expectRevert(
+            IBondingCurve.BondingCurve__NotBondingCurveFactory.selector
+        );
+        bondingCurve.buyTokenForDev{value: START_AMOUNT}(address(this), 0, ID);
     }
 
     function testCantSellWhenNotOnCurve() public {
@@ -215,10 +246,10 @@ contract BondingCurveTest is Test {
         uint256 expectedTime = block.timestamp +
             maxLockDuration +
             additionalTime;
-        vm.prank(USER, USER);
+        vm.prank(USER);
         (bool success, ) = _sendEtherToCurve(GOAL_AMOUNT);
         vm.warp(block.timestamp + maxLockDuration);
-        vm.prank(USER, USER);
+        vm.prank(USER);
         _sendEtherToCurve(MINIMAL_AMOUNT);
         (uint256 duration, , , ) = burnableToken.holdersVesting(USER);
 
@@ -228,10 +259,10 @@ contract BondingCurveTest is Test {
     function testVestingPreMigrationSameTime() external {
         uint256 expectedTime = block.timestamp + maxLockDuration;
 
-        vm.prank(USER, USER);
+        vm.prank(USER);
         (bool success, ) = _sendEtherToCurve(GOAL_AMOUNT);
         vm.warp(block.timestamp + maxLockDuration / 2);
-        vm.prank(USER, USER);
+        vm.prank(USER);
         _sendEtherToCurve(MINIMAL_AMOUNT);
         (uint256 duration, , , ) = burnableToken.holdersVesting(USER);
 

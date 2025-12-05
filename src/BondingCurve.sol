@@ -12,6 +12,7 @@ import {IBondingCurve} from "src/interfaces/IBondingCurve.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {StringValidator} from "src/libraries/StringValidator.sol";
 
 contract BondingCurve is
     Initializable,
@@ -20,6 +21,8 @@ contract BondingCurve is
     ReentrancyGuard,
     IBondingCurve
 {
+    using StringValidator for string;
+
     uint256 private constant PROTECTED_BLOCKS_COUNT = 3;
     uint256 private constant SCALE = 10 ** 18;
     uint256 private constant BONDING_CURVE_GOAL = 4.5 ether;
@@ -65,11 +68,14 @@ contract BondingCurve is
         _;
     }
     modifier sniperProtected() {
-        if (
-            block.number < initializationBlock + PROTECTED_BLOCKS_COUNT &&
-            tx.origin != token.dev()
-        ) {
+        if (block.number < initializationBlock + PROTECTED_BLOCKS_COUNT) {
             revert BondingCurve__Protected();
+        }
+        _;
+    }
+    modifier onlyFactory() {
+        if (msg.sender != address(s_bondingCurveFactory)) {
+            revert BondingCurve__NotBondingCurveFactory();
         }
         _;
     }
@@ -133,7 +139,7 @@ contract BondingCurve is
         string memory id
     ) external beforeBonding nonReentrant {
         uint256 returnAmount = _continuousSell(amount, minAmount, id);
-        _transferEther(tx.origin, returnAmount);
+        _transferEther(msg.sender, returnAmount);
     }
 
     /**
@@ -143,11 +149,18 @@ contract BondingCurve is
         uint256 minAmount,
         string memory id
     ) public payable beforeBonding sniperProtected nonReentrant {
-        uint256 startLiquidity = virtualLiquidity - START_VIRTUAL_LIQUIDITY;
+        _buyToken(msg.sender, msg.value, minAmount, id);
+    }
 
-        _continuousBuy(msg.value, minAmount, id);
-        _checkKingOfTheCasts(startLiquidity);
-        _checkIsMigrating();
+    /**
+     * @inheritdoc IBondingCurve
+     */
+    function buyTokenForDev(
+        address dev,
+        uint256 minAmount,
+        string memory id
+    ) public payable onlyFactory nonReentrant {
+        _buyToken(dev, msg.value, minAmount, id);
     }
 
     /**
@@ -213,7 +226,21 @@ contract BondingCurve is
         return address(s_liquidityMigrator);
     }
 
+    function _buyToken(
+        address recipient,
+        uint256 buyAmount,
+        uint256 minAmount,
+        string memory id
+    ) private {
+        uint256 startLiquidity = virtualLiquidity - START_VIRTUAL_LIQUIDITY;
+
+        _continuousBuy(recipient, buyAmount, minAmount, id);
+        _checkKingOfTheCasts(startLiquidity);
+        _checkIsMigrating();
+    }
+
     function _continuousBuy(
+        address recipient,
         uint256 _deposit,
         uint256 minAmount,
         string memory id
@@ -221,10 +248,11 @@ contract BondingCurve is
         if (_deposit <= 0) {
             revert BondingCurve__AmountMustBePositive();
         }
+        id = _checkAndReturnId(id);
 
         uint256 refundAmount = _checkIsBalanceMoreThanGoal();
         _deposit -= refundAmount;
-        _deposit -= _deductFee(_deposit);
+        _deposit -= _deductFee(recipient, _deposit);
 
         uint256 amount = calculateContinuousBuyReturn(_deposit);
         if (amount < minAmount) {
@@ -238,21 +266,21 @@ contract BondingCurve is
             int256(calculateContinuousSellReturn(amount));
 
         if (refundAmount > 0) {
-            _transferEther(tx.origin, refundAmount);
+            _transferEther(recipient, refundAmount);
         }
-        token.transfer(tx.origin, amount);
-        _extendHolderTransfersLock(startLiquidity);
+        token.transfer(recipient, amount);
+        _extendHolderTransfersLock(recipient, startLiquidity);
 
-        (uint256 unlockTime, , , ) = token.holdersVesting(tx.origin);
+        (uint256 unlockTime, , , ) = token.holdersVesting(recipient);
         s_bondingCurvesStorage.emitBuy(
             address(token),
-            tx.origin,
+            recipient,
             amount,
             _deposit,
             id,
             unlockTime
         );
-        emit Buy(tx.origin, amount, _deposit, id, unlockTime);
+        emit Buy(recipient, amount, _deposit, id, unlockTime);
 
         return amount;
     }
@@ -265,12 +293,13 @@ contract BondingCurve is
         if (deposit <= 0) {
             revert BondingCurve__AmountMustBePositive();
         }
-        if (token.balanceOf(tx.origin) < deposit) {
+        if (token.balanceOf(msg.sender) < deposit) {
             revert BondingCurve__AmountMoreThanBalance();
         }
+        id = _checkAndReturnId(id);
 
         uint256 reimburseAmount = calculateContinuousSellReturn(deposit);
-        uint256 fee = _deductFee(reimburseAmount);
+        uint256 fee = _deductFee(msg.sender, reimburseAmount);
         virtualLiquidity -= reimburseAmount;
         virtualTokenSupply -= deposit;
         reimburseAmount -= fee;
@@ -278,15 +307,15 @@ contract BondingCurve is
             revert BondingCurve__MinimumAmountNotMet();
         }
 
-        token.transferFrom(tx.origin, address(this), deposit);
+        token.transferFrom(msg.sender, address(this), deposit);
         s_bondingCurvesStorage.emitSell(
             address(token),
-            tx.origin,
+            msg.sender,
             deposit,
             reimburseAmount,
             id
         );
-        emit Sell(tx.origin, deposit, reimburseAmount, id);
+        emit Sell(msg.sender, deposit, reimburseAmount, id);
 
         return reimburseAmount;
     }
@@ -315,9 +344,12 @@ contract BondingCurve is
         }
     }
 
-    function _deductFee(uint256 amount) private returns (uint256) {
+    function _deductFee(
+        address recipient,
+        uint256 amount
+    ) private returns (uint256) {
         try s_bondingCurvesStorage.basedNFTs(0) returns (address nft) {
-            if (IERC721(nft).balanceOf(tx.origin) > 0) {
+            if (IERC721(nft).balanceOf(recipient) > 0) {
                 return 0; // no fee for basedNFT holders
             }
         } catch {
@@ -374,7 +406,10 @@ contract BondingCurve is
         }
     }
 
-    function _extendHolderTransfersLock(uint256 balance) private {
+    function _extendHolderTransfersLock(
+        address recipient,
+        uint256 balance
+    ) private {
         if (!isOnCurve) {
             return;
         }
@@ -385,6 +420,15 @@ contract BondingCurve is
             ((MAX_LOCK_DURATION - MIN_LOCK_DURATION) * remainingCurveProgress) /
             SCALE;
 
-        token.extendLockDuration(tx.origin, block.timestamp + lockDuration);
+        token.extendLockDuration(recipient, block.timestamp + lockDuration);
+    }
+
+    function _checkAndReturnId(
+        string memory id
+    ) private pure returns (string memory) {
+        if (!id.isValidString(false)) {
+            return "";
+        }
+        return id;
     }
 }

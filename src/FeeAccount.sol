@@ -12,6 +12,7 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {ILocker} from "@velodrome-finance/pool-launcher/interfaces/ILocker.sol";
+import {OracleLibrary} from "@velodrome-finance/slipstream/periphery/libraries/OracleLibrary.sol";
 import {BurnableToken} from "src/BurnableToken.sol";
 import {ILiquidityMigrator, IWETH9} from "src/interfaces/ILiquidityMigrator.sol";
 import {RewardResolver} from "src/RewardResolver.sol";
@@ -28,14 +29,16 @@ contract FeeAccount is
     IFeeAccount,
     IERC721Receiver
 {
-    uint16 private constant FEE_SCALE = 1000;
+    uint16 private constant SCALE = 1000;
     uint128 private constant UINT128_MAX = type(uint128).max;
+    uint16 private slippage;
     address payable public treasury;
     RewardResolver public rewardResolver;
     ILiquidityMigrator public liquidityMigrator;
     address public liquidityLocker;
     address public swapRouter;
     uint256 public devRewardsCliff;
+    uint256 public totalAccummulatedWethAmounts;
     uint16 public devRewardPercent;
     uint16 public treasuryRewardPercent;
     uint16 public basePercent;
@@ -97,6 +100,7 @@ contract FeeAccount is
         basePercent = 500;
         additivePercent = 100;
         devRewardsCliff = 30; // number of days
+        slippage = 800;
 
         // Initializing the subgraph's LatestReward entity.
         emit Rewarded(address(0), address(0), 0, block.timestamp);
@@ -209,6 +213,16 @@ contract FeeAccount is
     }
 
     /**
+     * @notice Sets the slippage tolerance for swaps, in basis points (scale of thousand and acutal value is calculated as 1000 - value, e.g. value of 800 = 1000 - 800 = 200 => 20% slippage).
+     * @dev This function can only be called by the owner of the contract.
+     *
+     * @param _slippage The slippage tolerance for swaps.
+     */
+    function setSlippage(uint16 _slippage) external onlyOwner {
+        slippage = _slippage;
+    }
+
+    /**
      * @inheritdoc IFeeAccount
      */
     function addCompetingToken(
@@ -272,18 +286,18 @@ contract FeeAccount is
         wethAmount += accummulatedWethAmounts[token];
         uint256 devRewardAmount;
         uint256 lockRewardAmount;
-        if (tokenBalance >= FEE_SCALE) {
+        if (tokenBalance >= SCALE) {
             devRewardAmount = burnableToken.dev() == address(0)
                 ? 0
-                : (tokenBalance * devRewardPercent) / FEE_SCALE;
+                : (tokenBalance * devRewardPercent) / SCALE;
             lockRewardAmount = tokenBalance - devRewardAmount;
         }
-        uint256 treasuryAmount = (wethAmount * treasuryRewardPercent) /
-            FEE_SCALE;
+        uint256 treasuryAmount = (wethAmount * treasuryRewardPercent) / SCALE;
         uint256 dividendAmount = wethAmount - treasuryAmount;
         if (treasuryAmount == 0) {
             dividendAmount = 0;
             accummulatedWethAmounts[token] += wethAmount;
+            totalAccummulatedWethAmounts += wethAmount;
         }
         if (treasuryAmount > 0) {
             weth.transfer(address(treasury), treasuryAmount);
@@ -317,6 +331,7 @@ contract FeeAccount is
         }
         if (dividendAmount > 0) {
             weth.withdraw(dividendAmount);
+            totalAccummulatedWethAmounts -= accummulatedWethAmounts[token];
             accummulatedWethAmounts[token] = 0;
             burnableToken.distributeDividends{value: dividendAmount}();
         }
@@ -361,7 +376,9 @@ contract FeeAccount is
     ) external nonReentrant {
         (bool upkeepNeeded, ) = checkUpkeep("");
         IWETH9 weth = liquidityMigrator.getWeth();
-        weth.withdraw(weth.balanceOf(address(this)));
+        weth.withdraw(
+            weth.balanceOf(address(this)) - totalAccummulatedWethAmounts
+        );
         if (!upkeepNeeded) {
             revert FeeAccount__UpkeepNotNeeded(rewardResolver.getState());
         }
@@ -396,18 +413,32 @@ contract FeeAccount is
         address winner
     ) internal {
         IWETH9 weth = liquidityMigrator.getWeth();
-        uint256 wethBalance = weth.balanceOf(address(this));
-        uint256 ethBalance = address(this).balance;
+        uint256 amountInEth;
+        uint256 amountInTotal;
+        // avoid stack too deep errors
+        {
+            uint256 wethBalance = weth.balanceOf(address(this));
+            uint256 ethBalance = address(this).balance;
 
-        uint256 percent = basePercent + additivePercent * multiplier;
-        uint256 amountInEth = (ethBalance * percent) / FEE_SCALE;
-        uint256 amountInWeth = (wethBalance * percent) / FEE_SCALE;
-        uint256 amountInTotal = amountInEth + amountInWeth;
+            uint256 percent = basePercent + additivePercent * multiplier;
+            amountInEth = (ethBalance * percent) / SCALE;
+            uint256 amountInWeth = (wethBalance * percent) / SCALE;
+            amountInTotal = amountInEth + amountInWeth;
+        }
         if (amountInTotal == 0) {
             return;
         }
 
         ISwapRouter swapRouterInstance = ISwapRouter(swapRouter);
+
+        (, int24 tick, , , , ) = winnerTokenData.pool.slot0();
+        uint256 quoteAmount = OracleLibrary.getQuoteAtTick(
+            tick,
+            uint128(amountInEth),
+            address(weth),
+            address(winnerTokenData.otherToken)
+        );
+        uint256 amountOutMinimum = (quoteAmount * slippage) / SCALE;
 
         weth.deposit{value: amountInEth}();
         weth.approve(address(swapRouterInstance), amountInTotal);
@@ -420,7 +451,7 @@ contract FeeAccount is
                 recipient: address(this),
                 deadline: block.timestamp,
                 amountIn: amountInTotal,
-                amountOutMinimum: 0,
+                amountOutMinimum: amountOutMinimum,
                 sqrtPriceLimitX96: 0
             });
 

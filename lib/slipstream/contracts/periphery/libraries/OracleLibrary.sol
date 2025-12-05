@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-pragma solidity >=0.5.0 <0.8.0;
+pragma solidity >=0.5.0 <=0.8.22;
 
-import "contracts/core/libraries/FullMath.sol";
-import "contracts/core/libraries/TickMath.sol";
-import "contracts/core/interfaces/ICLPool.sol";
+import '../../core/libraries/FullMath.sol';
+import '../../core/libraries/TickMath.sol';
+import '../../core/interfaces/ICLPool.sol';
 
 /// @title Oracle library
 /// @notice Provides functions to integrate with V3 pool oracle
@@ -13,27 +13,27 @@ library OracleLibrary {
     /// @param secondsAgo Number of seconds in the past from which to calculate the time-weighted means
     /// @return arithmeticMeanTick The arithmetic mean tick from (block.timestamp - secondsAgo) to block.timestamp
     /// @return harmonicMeanLiquidity The harmonic mean liquidity from (block.timestamp - secondsAgo) to block.timestamp
-    function consult(address pool, uint32 secondsAgo)
-        internal
-        view
-        returns (int24 arithmeticMeanTick, uint128 harmonicMeanLiquidity)
-    {
-        require(secondsAgo != 0, "BP");
+    function consult(
+        address pool,
+        uint32 secondsAgo
+    ) internal view returns (int24 arithmeticMeanTick, uint128 harmonicMeanLiquidity) {
+        require(secondsAgo != 0, 'BP');
 
         uint32[] memory secondsAgos = new uint32[](2);
         secondsAgos[0] = secondsAgo;
         secondsAgos[1] = 0;
 
-        (int56[] memory tickCumulatives, uint160[] memory secondsPerLiquidityCumulativeX128s) =
-            ICLPool(pool).observe(secondsAgos);
+        (int56[] memory tickCumulatives, uint160[] memory secondsPerLiquidityCumulativeX128s) = ICLPool(pool).observe(
+            secondsAgos
+        );
 
         int56 tickCumulativesDelta = tickCumulatives[1] - tickCumulatives[0];
-        uint160 secondsPerLiquidityCumulativesDelta =
-            secondsPerLiquidityCumulativeX128s[1] - secondsPerLiquidityCumulativeX128s[0];
+        uint160 secondsPerLiquidityCumulativesDelta = secondsPerLiquidityCumulativeX128s[1] -
+            secondsPerLiquidityCumulativeX128s[0];
 
-        arithmeticMeanTick = int24(tickCumulativesDelta / secondsAgo);
+        arithmeticMeanTick = int24(tickCumulativesDelta / int32(secondsAgo));
         // Always round to negative infinity
-        if (tickCumulativesDelta < 0 && (tickCumulativesDelta % secondsAgo != 0)) arithmeticMeanTick--;
+        if (tickCumulativesDelta < 0 && (tickCumulativesDelta % int32(secondsAgo) != 0)) arithmeticMeanTick--;
 
         // We are multiplying here instead of shifting to ensure that harmonicMeanLiquidity doesn't overflow uint128
         uint192 secondsAgoX160 = uint192(secondsAgo) * type(uint160).max;
@@ -46,11 +46,12 @@ library OracleLibrary {
     /// @param baseToken Address of an ERC20 token contract used as the baseAmount denomination
     /// @param quoteToken Address of an ERC20 token contract used as the quoteAmount denomination
     /// @return quoteAmount Amount of quoteToken received for baseAmount of baseToken
-    function getQuoteAtTick(int24 tick, uint128 baseAmount, address baseToken, address quoteToken)
-        internal
-        pure
-        returns (uint256 quoteAmount)
-    {
+    function getQuoteAtTick(
+        int24 tick,
+        uint128 baseAmount,
+        address baseToken,
+        address quoteToken
+    ) internal pure returns (uint256 quoteAmount) {
         uint160 sqrtRatioX96 = TickMath.getSqrtRatioAtTick(tick);
 
         // Calculate quoteAmount with better precision if it doesn't overflow when multiplied by itself
@@ -71,16 +72,17 @@ library OracleLibrary {
     /// @param pool Address of CL pool that we want to observe
     /// @return secondsAgo The number of seconds ago of the oldest observation stored for the pool
     function getOldestObservationSecondsAgo(address pool) internal view returns (uint32 secondsAgo) {
-        (,, uint16 observationIndex, uint16 observationCardinality,,) = ICLPool(pool).slot0();
-        require(observationCardinality > 0, "NI");
+        (, , uint16 observationIndex, uint16 observationCardinality, , ) = ICLPool(pool).slot0();
+        require(observationCardinality > 0, 'NI');
 
-        (uint32 observationTimestamp,,, bool initialized) =
-            ICLPool(pool).observations((observationIndex + 1) % observationCardinality);
+        (uint32 observationTimestamp, , , bool initialized) = ICLPool(pool).observations(
+            (observationIndex + 1) % observationCardinality
+        );
 
         // The next index might not be initialized if the cardinality is in the process of increasing
         // In this case the oldest observation is always in index 0
         if (!initialized) {
-            (observationTimestamp,,,) = ICLPool(pool).observations(0);
+            (observationTimestamp, , , ) = ICLPool(pool).observations(0);
         }
 
         secondsAgo = uint32(block.timestamp) - observationTimestamp;
@@ -90,16 +92,16 @@ library OracleLibrary {
     /// @param pool Address of CL pool
     /// @return The tick that the pool was in at the start of the current block
     function getBlockStartingTickAndLiquidity(address pool) internal view returns (int24, uint128) {
-        (, int24 tick, uint16 observationIndex, uint16 observationCardinality,,) = ICLPool(pool).slot0();
+        (, int24 tick, uint16 observationIndex, uint16 observationCardinality, , ) = ICLPool(pool).slot0();
 
         // 2 observations are needed to reliably calculate the block starting tick
-        require(observationCardinality > 1, "NEO");
+        require(observationCardinality > 1, 'NEO');
 
         // If the latest observation occurred in the past, then no tick-changing trades have happened in this block
         // therefore the tick in `slot0` is the same as at the beginning of the current block.
         // We don't need to check if this observation is initialized - it is guaranteed to be.
-        (uint32 observationTimestamp, int56 tickCumulative, uint160 secondsPerLiquidityCumulativeX128,) =
-            ICLPool(pool).observations(observationIndex);
+        (uint32 observationTimestamp, int56 tickCumulative, uint160 secondsPerLiquidityCumulativeX128, ) = ICLPool(pool)
+            .observations(observationIndex);
         if (observationTimestamp != uint32(block.timestamp)) {
             return (tick, ICLPool(pool).liquidity());
         }
@@ -112,13 +114,13 @@ library OracleLibrary {
             bool prevInitialized
         ) = ICLPool(pool).observations(prevIndex);
 
-        require(prevInitialized, "ONI");
+        require(prevInitialized, 'ONI');
 
         uint32 delta = observationTimestamp - prevObservationTimestamp;
-        tick = int24((tickCumulative - prevTickCumulative) / delta);
+        tick = int24((tickCumulative - prevTickCumulative) / int32(delta));
         uint128 liquidity = uint128(
-            (uint192(delta) * type(uint160).max)
-                / (uint192(secondsPerLiquidityCumulativeX128 - prevSecondsPerLiquidityCumulativeX128) << 32)
+            (uint192(delta) * type(uint160).max) /
+                (uint192(secondsPerLiquidityCumulativeX128 - prevSecondsPerLiquidityCumulativeX128) << 32)
         );
         return (tick, liquidity);
     }
@@ -135,11 +137,9 @@ library OracleLibrary {
     /// @dev Each entry of `weightedTickData` should represents ticks from pools with the same underlying pool tokens. If they do not,
     /// extreme care must be taken to ensure that ticks are comparable (including decimal differences).
     /// @dev Note that the weighted arithmetic mean tick corresponds to the weighted geometric mean price.
-    function getWeightedArithmeticMeanTick(WeightedTickData[] memory weightedTickData)
-        internal
-        pure
-        returns (int24 weightedArithmeticMeanTick)
-    {
+    function getWeightedArithmeticMeanTick(
+        WeightedTickData[] memory weightedTickData
+    ) internal pure returns (int24 weightedArithmeticMeanTick) {
         // Accumulates the sum of products between each tick and its weight
         int256 numerator;
 
@@ -148,7 +148,7 @@ library OracleLibrary {
 
         // Products fit in 152 bits, so it would take an array of length ~2**104 to overflow this logic
         for (uint256 i; i < weightedTickData.length; i++) {
-            numerator += weightedTickData[i].tick * int256(weightedTickData[i].weight);
+            numerator += weightedTickData[i].tick * int128(weightedTickData[i].weight);
             denominator += weightedTickData[i].weight;
         }
 
@@ -163,12 +163,11 @@ library OracleLibrary {
     /// @param tokens The token contract addresses
     /// @param ticks The ticks, representing the price of each token pair in `tokens`
     /// @return syntheticTick The synthetic tick, representing the relative price of the outermost tokens in `tokens`
-    function getChainedPrice(address[] memory tokens, int24[] memory ticks)
-        internal
-        pure
-        returns (int256 syntheticTick)
-    {
-        require(tokens.length - 1 == ticks.length, "DL");
+    function getChainedPrice(
+        address[] memory tokens,
+        int24[] memory ticks
+    ) internal pure returns (int256 syntheticTick) {
+        require(tokens.length - 1 == ticks.length, 'DL');
         for (uint256 i = 1; i <= ticks.length; i++) {
             // check the tokens for address sort order, then accumulate the
             // ticks into the running synthetic tick, ensuring that intermediate tokens "cancel out"

@@ -270,6 +270,8 @@ contract BondingCurveTest is Test {
             )
         );
         BondingCurve bondingCurve = BondingCurve(bondingCurveAddress);
+        vm.warp(block.timestamp + 1);
+        vm.roll(block.number + 3);
 
         vm.startPrank(USER1, USER1);
         bondingCurve.buyToken{value: 10 ether}(0, ID);

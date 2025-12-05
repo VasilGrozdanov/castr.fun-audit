@@ -14,6 +14,7 @@ import {IDividendToken} from "src/interfaces/IDividendToken.sol";
 import {IBurnableTokenActions} from "src/interfaces/IBurnableTokenActions.sol";
 import {IFeeAccount} from "src/interfaces/IFeeAccount.sol";
 import {VestingCalculator} from "src/libraries/VestingCalculator.sol";
+import {StringValidator} from "src/libraries/StringValidator.sol";
 
 contract BurnableToken is
     Initializable,
@@ -31,6 +32,8 @@ contract BurnableToken is
         uint256 lockedAmount;
     }
 
+    using StringValidator for string;
+
     IAddressChecker public s_addressChecker;
     bool public s_isDevLocked;
     bool public isLaunched;
@@ -46,6 +49,8 @@ contract BurnableToken is
     uint256 public totalVestedSupply;
     uint256 public constant MIN_VESTING_PERIOD = 1 days;
     uint256 public constant MAX_VESTING_PERIOD = 365 days;
+    uint256 public constant MAX_NAME_LENGTH = 20;
+    uint256 public constant MAX_SYMBOL_LENGTH = 10;
     bytes public metadata;
     // With `magnitude`, we can properly distribute dividends even if the amount of received ether is small.
     uint256 private constant MAGNITUDE = 2 ** 128;
@@ -172,6 +177,18 @@ contract BurnableToken is
         if (addressChecker == address(0)) {
             revert BurnableToken__ZeroAddressChecker();
         }
+        if (
+            !_name.isValidString(true) || !_name.isValidLength(MAX_NAME_LENGTH)
+        ) {
+            revert BurnableToken__InvalidName();
+        }
+        if (
+            !_symbol.isValidString(false) ||
+            !_symbol.isValidLength(MAX_SYMBOL_LENGTH)
+        ) {
+            revert BurnableToken__InvalidSymbol();
+        }
+
         __Ownable_init(msg.sender);
         __ERC20_init(_name, _symbol);
         __ERC20Burnable_init();

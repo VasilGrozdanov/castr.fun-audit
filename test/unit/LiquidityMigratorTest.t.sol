@@ -426,6 +426,7 @@ contract LiquidityMigratorTest is Test {
         feeAccount.collectFeesAndDistribute(payable(address(memeCoin)));
 
         ILockManager lockManager = memeCoin.lockManager();
+        console2.log("is meme gt weth?", address(memeCoin) > address(weth));
 
         assertTrue(address(lockManager) != address(0));
         assertGt(memeCoin.balanceOf(address(lockManager)), 0);

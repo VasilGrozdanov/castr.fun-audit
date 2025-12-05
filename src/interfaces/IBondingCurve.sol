@@ -30,6 +30,7 @@ interface IBondingCurve {
     error BondingCurve__TokenAlreadyBonded();
     error BondingCurve__TransferFailed();
     error BondingCurve__Protected();
+    error BondingCurve__NotBondingCurveFactory();
     error BondingCurve__Locked(uint256 unlockTime);
 
     /**
@@ -58,8 +59,8 @@ interface IBondingCurve {
 
     /**
      * @notice This function allows users to sell tokens they hold on the bonding curve for ETH.
-     * @notice The function uses tx.origin as a sender and reciever, which is the original caller of the transaction.
-     * @notice The function is blocked from being called if the tx.origin is locked from transfering (see extendLockDuration(address,uint256) in IBurnableTokenActions).
+     * @notice The function uses msg.sender as a sender and reciever.
+     * @notice The function is blocked from being called if the msg.sender is locked from transfering (see extendLockDuration(address,uint256) in IBurnableTokenActions).
      * @dev It transfers the specified amount of tokens from the caller to the contract and then calculates the reimbursement amount based on the bonding curve's sell logic.
      * It ensures that the amount to be sold is positive and that the minimum amount to be received is met.
      * It also checks that the caller has enough tokens to sell and that the bonding curve is not locked (until the token migrates).
@@ -77,8 +78,8 @@ interface IBondingCurve {
 
     /**
      * @notice This function allows users to buy tokens from the bonding curve using ETH.
-     * @notice The function uses tx.origin as a sender and reciever, which is the original caller of the transaction.
-     * @notice The function is NOT blocked from being called if the tx.origin is locked from transfering (see extendLockDuration(address,uint256) in IBurnableTokenActions).
+     * @notice The function uses msg.sender as a sender and reciever.
+     * @notice The function is NOT blocked from being called if the msg.sender is locked from transfering (see extendLockDuration(address,uint256) in IBurnableTokenActions).
      * @dev It calculates the amount of tokens to be bought based on the bonding curve's buy logic and ensures that the minimum amount of tokens to be received is met.
      * It also checks that the bonding curve is not locked (until the token migrates).
      * Emits a Buy event upon successful completion.
@@ -87,6 +88,22 @@ interface IBondingCurve {
      * @param id A unique identifier for the creator of the bonding curve. This is used in the frontend (emitted in an event) to distinguish between different accounts with the same wallet address. The id is either the FID (Farcaster ID) or the DID (Privy's Decentralized Identifier). If you want to skip this, you can pass an empty string or '0'.
      */
     function buyToken(uint256 minAmount, string memory id) external payable;
+
+    /**
+     * @notice This function allows the developer to be the first to buy tokens from the bonding curve using ETH.
+     * @dev This function is intended to be called only by the bonding curve factory during the creation of the bonding curve.
+     * It calculates the amount of tokens to be bought based on the bonding curve's buy logic and ensures that the minimum amount of tokens to be received is met.
+     * Emits a Buy event upon successful completion.
+     *
+     * @param dev The address of the developer for whom the tokens are being bought.
+     * @param minAmount The minimum amount of tokens to receive in return for the ETH sent.
+     * @param id A unique identifier for the creator of the bonding curve. This is used in the frontend (emitted in an event) to distinguish between different accounts with the same wallet address. The id is either the FID (Farcaster ID) or the DID (Privy's Decentralized Identifier). If you want to skip this, you can pass an empty string or '0'.
+     */
+    function buyTokenForDev(
+        address dev,
+        uint256 minAmount,
+        string memory id
+    ) external payable;
 
     /**
      * @notice This function calculates how much tokens can be bought for a specified amount of ETH on the bonding curve. This does not include the fee.

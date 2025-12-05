@@ -18,6 +18,8 @@ interface IBurnableTokenContext {
     error BurnableToken__NotFeeAccount();
     error BurnableToken__NotDev();
     error BurnableToken__NotLockManager();
+    error BurnableToken__InvalidName();
+    error BurnableToken__InvalidSymbol();
 
     event DividendsDistributed(address indexed sender, uint256 amount);
     event DividendWithdrawn(address indexed receiver, uint256 amount);

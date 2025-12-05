@@ -51,6 +51,90 @@ contract BurnableTokenTest is Test {
         );
     }
 
+    function testCreateRevertsInvalidNameCharacters() external {
+        (
+            AddressChecker addressChecker,
+            BurnableToken _burnableToken
+        ) = _setUpToken();
+        vm.expectRevert(
+            IBurnableTokenContext.BurnableToken__InvalidName.selector
+        );
+        _burnableToken.initialize(
+            "Test!",
+            "TEST",
+            "",
+            address(addressChecker),
+            false,
+            OWNER,
+            address(0),
+            address(0),
+            address(0)
+        );
+    }
+
+    function testCreateRevertsInvalidNameLength() external {
+        (
+            AddressChecker addressChecker,
+            BurnableToken _burnableToken
+        ) = _setUpToken();
+        vm.expectRevert(
+            IBurnableTokenContext.BurnableToken__InvalidName.selector
+        );
+        _burnableToken.initialize(
+            "Test          Too          Long!",
+            "TEST",
+            "",
+            address(addressChecker),
+            false,
+            OWNER,
+            address(0),
+            address(0),
+            address(0)
+        );
+    }
+
+    function testCreateRevertsInvalidSymbolCharacters() external {
+        (
+            AddressChecker addressChecker,
+            BurnableToken _burnableToken
+        ) = _setUpToken();
+        vm.expectRevert(
+            IBurnableTokenContext.BurnableToken__InvalidSymbol.selector
+        );
+        _burnableToken.initialize(
+            "Test",
+            "TEST!",
+            "",
+            address(addressChecker),
+            false,
+            OWNER,
+            address(0),
+            address(0),
+            address(0)
+        );
+    }
+
+    function testCreateRevertsInvalidSymbolLength() external {
+        (
+            AddressChecker addressChecker,
+            BurnableToken _burnableToken
+        ) = _setUpToken();
+        vm.expectRevert(
+            IBurnableTokenContext.BurnableToken__InvalidSymbol.selector
+        );
+        _burnableToken.initialize(
+            "Test",
+            "TESTTOOLOONG",
+            "",
+            address(addressChecker),
+            false,
+            OWNER,
+            address(0),
+            address(0),
+            address(0)
+        );
+    }
+
     function testTransferToEaoOk() external {
         vm.prank(OWNER);
         burnableToken.transfer(USER, GOAL_AMOUNT);
@@ -102,5 +186,13 @@ contract BurnableTokenTest is Test {
     function testChangeDevRevertsWhenNotDev() external {
         vm.expectRevert(IBurnableTokenContext.BurnableToken__NotDev.selector);
         devLockedBurnableToken.setDev(USER);
+    }
+
+    function _setUpToken() private returns (AddressChecker, BurnableToken) {
+        AddressChecker addressChecker = new AddressChecker(dexes);
+        BurnableToken burnableTokenImpl = new BurnableToken();
+        address clone = Clones.clone(address(burnableTokenImpl));
+        BurnableToken token = BurnableToken(payable(clone));
+        return (addressChecker, token);
     }
 }
