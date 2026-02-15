@@ -49,7 +49,7 @@ contract BurnableToken is
     uint256 public totalVestedSupply;
     uint256 public constant MIN_VESTING_PERIOD = 1 days;
     uint256 public constant MAX_VESTING_PERIOD = 365 days;
-    uint256 public constant MAX_NAME_LENGTH = 20;
+    uint256 public constant MAX_NAME_LENGTH = 30;
     uint256 public constant MAX_SYMBOL_LENGTH = 10;
     bytes public metadata;
     // With `magnitude`, we can properly distribute dividends even if the amount of received ether is small.
