@@ -10,7 +10,6 @@ interface IBondingCurveFactory {
 
     error BondingCurveFactory__NotActive();
     error BondingCurveFactory__NotFactoryManager();
-    error BondingCurveFactory__NotFactoryManagerOrOwner();
 
     /**
      * @notice Creates a new bonding curve and a BurnableToken, with the specified name and symbol. The msg.sender will be set as the developer of the token.

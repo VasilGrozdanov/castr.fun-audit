@@ -22,6 +22,9 @@ contract LiquidityMigrator is Ownable, ILiquidityMigrator {
     string public constant LIQUIDITY_LOCKER_FEE_NAME = "LLP";
     uint32 private constant ETERNAL_LOCK = type(uint32).max;
     uint256 private constant Q96 = 2 ** 96;
+    int24 private constant TICK_SPACING = 2000; // 1% fee tier
+    address public constant AERO_LOCKER_FACTORY =
+        0x8BF02b8da7a6091Ac1326d6db2ed25214D812219;
     address payable private immutable i_feeAccount;
     address private immutable i_wethAdress;
     IWETH9 private immutable i_weth;
@@ -29,9 +32,6 @@ contract LiquidityMigrator is Ownable, ILiquidityMigrator {
     ICLFactory private immutable i_iclFactory;
     ILiquidityLocker private immutable i_liquidityLocker;
     IBondingCurvesStorage private s_bondingCurvesStorage;
-    int24 private tickSpacing = 2000; // 1% fee tier
-    address public constant AERO_LOCKER_FACTORY =
-        0x8BF02b8da7a6091Ac1326d6db2ed25214D812219;
 
     modifier onlyBondingCurve() {
         if (!s_bondingCurvesStorage.bondingCurves(msg.sender)) {
@@ -148,7 +148,7 @@ contract LiquidityMigrator is Ownable, ILiquidityMigrator {
         pool.poolAddress = i_iclFactory.getPool(
             pool.token0.tokenAddress,
             pool.token1.tokenAddress,
-            tickSpacing
+            TICK_SPACING
         );
         pool.instance = ICLPool(pool.poolAddress);
         locker = _lockLiquidity(tokenId, pool.poolAddress);
@@ -251,9 +251,9 @@ contract LiquidityMigrator is Ownable, ILiquidityMigrator {
             memory params = INonfungiblePositionManager.MintParams({
                 token0: pool.token0.tokenAddress,
                 token1: pool.token1.tokenAddress,
-                tickSpacing: tickSpacing,
-                tickLower: (TickMath.MIN_TICK / tickSpacing) * tickSpacing,
-                tickUpper: (TickMath.MAX_TICK / tickSpacing) * tickSpacing,
+                tickSpacing: TICK_SPACING,
+                tickLower: (TickMath.MIN_TICK / TICK_SPACING) * TICK_SPACING,
+                tickUpper: (TickMath.MAX_TICK / TICK_SPACING) * TICK_SPACING,
                 amount0Desired: pool.amount0,
                 amount1Desired: pool.amount1,
                 amount0Min: 0,
@@ -306,11 +306,11 @@ contract LiquidityMigrator is Ownable, ILiquidityMigrator {
         uint256 initialAmount,
         uint256 usedAmount
     ) internal {
-        uint256 sparemAmount = initialAmount - usedAmount;
-        if (!isWeth(token)) {
+        uint256 spareAmount = initialAmount - usedAmount;
+        if (token != i_wethAdress) {
             BurnableToken burnable = BurnableToken(token);
             burnable.approve(address(i_nonfungiblePositionManager), 0);
-            burnable.burn(sparemAmount);
+            burnable.burn(spareAmount);
             return;
         }
         i_weth.approve(address(i_nonfungiblePositionManager), 0);
@@ -318,10 +318,6 @@ contract LiquidityMigrator is Ownable, ILiquidityMigrator {
         if (i_weth.balanceOf(address(this)) > 0.1 ether) {
             _transferEtherToFeeAccount();
         }
-    }
-
-    function isWeth(address token) internal view returns (bool) {
-        return token == i_wethAdress;
     }
 
     function _transferEtherToFeeAccount() internal {

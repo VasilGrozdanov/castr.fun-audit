@@ -39,7 +39,8 @@ contract BancorBondingCurve is Power {
             _supply > 0 &&
                 _reserveBalance > 0 &&
                 _reserveRatio > 0 &&
-                _reserveRatio <= MAX_RESERVE_RATIO
+                _reserveRatio <= MAX_RESERVE_RATIO,
+            "Invalid input"
         );
         // special case for 0 deposit amount
         if (_depositAmount == 0) {
@@ -84,7 +85,8 @@ contract BancorBondingCurve is Power {
                 _reserveBalance > 0 &&
                 _reserveRatio > 0 &&
                 _reserveRatio <= MAX_RESERVE_RATIO &&
-                _sellAmount <= _supply
+                _sellAmount <= _supply,
+            "Invalid input"
         );
         // special case for 0 sell amount
         if (_sellAmount == 0) {

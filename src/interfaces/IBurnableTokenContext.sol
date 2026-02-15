@@ -12,10 +12,8 @@ interface IBurnableTokenContext {
     error BurnableToken__UnvestedAmount(uint256 unlockTime, uint256 amount);
     error BurnableToken__DevIsLocked();
     error BurnableToken__MustBeMoreThanZero();
-    error BurnableToken__NotEnoughBalance(uint256 amount, uint256 balance);
     error BurnableToken__BurnAmountExceedsBalance();
     error BurnableToken__ZeroAddressChecker();
-    error BurnableToken__NotFeeAccount();
     error BurnableToken__NotDev();
     error BurnableToken__NotLockManager();
     error BurnableToken__InvalidName();

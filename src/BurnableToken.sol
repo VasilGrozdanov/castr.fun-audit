@@ -403,7 +403,7 @@ contract BurnableToken is
     /**
      * @inheritdoc IDividendToken
      */
-    function withdrawDividend() public {
+    function withdrawDividend() external {
         _withdrawDividend(_msgSender());
     }
 
@@ -427,7 +427,7 @@ contract BurnableToken is
             );
 
             lockManager = _lockManager;
-            uint256 balance = balanceOf(address(this));
+            uint256 balance = this.balanceOf(address(this));
             if (balance > 0) {
                 this.transfer(address(_lockManager), balance);
                 _lockManager.distributeRewards(balance);
@@ -461,7 +461,9 @@ contract BurnableToken is
     /**
      * @inheritdoc IDividendToken
      */
-    function withdrawnDividendOf(address _owner) public view returns (uint256) {
+    function withdrawnDividendOf(
+        address _owner
+    ) external view returns (uint256) {
         return withdrawnDividends[_owner];
     }
 
@@ -533,13 +535,13 @@ contract BurnableToken is
     }
 
     function _toUint256Safe(int256 a) private pure returns (uint256) {
-        require(a >= 0);
+        require(a >= 0, "Negative value cannot be converted to uint256");
         return uint256(a);
     }
 
     function _toInt256Safe(uint256 a) private pure returns (int256) {
         int256 b = int256(a);
-        require(b >= 0);
+        require(b >= 0, "Value is too large to fit in int256");
         return b;
     }
 

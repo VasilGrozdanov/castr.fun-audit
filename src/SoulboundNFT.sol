@@ -191,8 +191,9 @@ contract SoulboundNFT is ERC721, Ownable {
         ) {
             revert SoulboundNFT__InvalidBatch();
         }
+        uint256 totalReceivers = receivers.length;
 
-        for (uint256 i = 0; i < receivers.length; i++) {
+        for (uint256 i = 0; i < totalReceivers; i++) {
             mint(
                 receivers[i],
                 _twitter_xHandles[i],

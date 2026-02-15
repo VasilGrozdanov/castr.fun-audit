@@ -29,7 +29,7 @@ library NFTDescriptor {
 
     function generateSVGImage(
         ConstructTokenURIParams memory params
-    ) public pure returns (string memory svg) {
+    ) external pure returns (string memory svg) {
         NFTSVG.SVGParams memory svgParams = NFTSVG.SVGParams({
             tokenName: params.tokenName,
             tokenSymbol: params.tokenSymbol,

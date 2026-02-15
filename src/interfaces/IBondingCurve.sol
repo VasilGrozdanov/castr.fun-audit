@@ -31,7 +31,6 @@ interface IBondingCurve {
     error BondingCurve__TransferFailed();
     error BondingCurve__Protected();
     error BondingCurve__NotBondingCurveFactory();
-    error BondingCurve__Locked(uint256 unlockTime);
 
     /**
      * @dev Initializes the bonding curve contract with the necessary parameters.

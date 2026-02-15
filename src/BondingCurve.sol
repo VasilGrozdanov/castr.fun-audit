@@ -155,17 +155,6 @@ contract BondingCurve is
     /**
      * @inheritdoc IBondingCurve
      */
-    function buyTokenForDev(
-        address dev,
-        uint256 minAmount,
-        string memory id
-    ) public payable onlyFactory nonReentrant {
-        _buyToken(dev, msg.value, minAmount, id);
-    }
-
-    /**
-     * @inheritdoc IBondingCurve
-     */
     function calculateContinuousBuyReturn(
         uint256 _amount
     ) public view returns (uint256) {
@@ -203,6 +192,17 @@ contract BondingCurve is
     function calculateMaxBuy() public view returns (uint256) {
         uint256 divisor = FEE_SCALE - s_feePercent;
         return (BONDING_CURVE_GOAL * FEE_SCALE) / divisor + 1;
+    }
+
+    /**
+     * @inheritdoc IBondingCurve
+     */
+    function buyTokenForDev(
+        address dev,
+        uint256 minAmount,
+        string memory id
+    ) external payable onlyFactory nonReentrant {
+        _buyToken(dev, msg.value, minAmount, id);
     }
 
     /**

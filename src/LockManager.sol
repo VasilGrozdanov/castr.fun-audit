@@ -3,8 +3,6 @@ pragma solidity 0.8.22;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {ILockPositionsNFT} from "src/interfaces/ILockPositionsNFT.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {FeeAccount} from "src/FeeAccount.sol";
 import {ILockManager} from "src/interfaces/ILockManager.sol";
 import {IDividendToken} from "src/interfaces/IDividendToken.sol";
 import {IBurnableTokenActions} from "src/interfaces/IBurnableTokenActions.sol";
