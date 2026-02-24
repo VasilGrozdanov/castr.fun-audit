@@ -429,7 +429,7 @@ contract BurnableToken is
             lockManager = _lockManager;
             uint256 balance = this.balanceOf(address(this));
             if (balance > 0) {
-                this.transfer(address(_lockManager), balance);
+                this.approve(address(_lockManager), balance);
                 _lockManager.distributeRewards(balance);
             }
             isBoosted = true;

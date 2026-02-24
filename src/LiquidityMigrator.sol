@@ -290,11 +290,6 @@ contract LiquidityMigrator is Ownable, ILiquidityMigrator {
             address(i_liquidityLocker),
             tokenId
         );
-
-        IERC721(address(i_nonfungiblePositionManager)).approve(
-            address(i_liquidityLocker),
-            tokenId
-        );
         i_liquidityLocker.lock(tokenId, poolAddress);
 
         emit LiquidityLocked(locker, tokenId, block.timestamp);

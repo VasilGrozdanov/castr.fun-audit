@@ -55,9 +55,9 @@ contract LockManager is
         }
         _;
     }
-    modifier onlyFeeAccountOrToken() {
-        if (msg.sender != feeAccount && msg.sender != address(dividendToken)) {
-            revert LockManager__NotFeeAccountOrToken();
+    modifier onlyFeeAccount() {
+        if (msg.sender != feeAccount) {
+            revert LockManager__NotFeeAccount();
         }
         _;
     }
@@ -141,6 +141,21 @@ contract LockManager is
     /**
      * @inheritdoc ILockManager
      */
+    function redistributeRewards(
+        uint256 tokenId
+    ) external onlyFeeAccount ownerOf(tokenId) {
+        (uint256 amount, uint256 lockShares, , ) = positionsNFT.positions(
+            tokenId
+        );
+
+        positionsNFT.burn(tokenId);
+        totalLockShares -= lockShares;
+        magnifiedRewardPerShare += (amount * MAGNITUDE) / (totalLockShares);
+    }
+
+    /**
+     * @inheritdoc ILockManager
+     */
     function distributeDividends() public payable {
         if (msg.value == 0) {
             return;
@@ -154,7 +169,16 @@ contract LockManager is
      * @inheritdoc ILockManager
      */ function distributeRewards(
         uint256 amount
-    ) external override onlyFeeAccountOrToken positive(amount) {
+    ) external override positive(amount) {
+        bool success = dividendToken.transferFrom(
+            msg.sender,
+            address(this),
+            amount
+        );
+        if (!success) {
+            revert LockManager__FailedToDistributeRewards();
+        }
+
         magnifiedRewardPerShare += (amount * MAGNITUDE) / (totalLockShares);
         emit RewardsDistributed(amount);
     }

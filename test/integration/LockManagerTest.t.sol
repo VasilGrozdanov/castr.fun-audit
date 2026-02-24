@@ -13,6 +13,7 @@ import {ISwapRouter} from "@velodrome-finance/slipstream/periphery/interfaces/IS
 import {LockManager, ILockManager} from "src/LockManager.sol";
 import {ILockPositionsNFT} from "src/interfaces/ILockPositionsNFT.sol";
 import {IERC721Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
+import {IERC20Errors} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract LockManagerTest is Test {
@@ -342,11 +343,50 @@ contract LockManagerTest is Test {
         );
     }
 
-    function testDistributeRewardsRevertsIfNotFeeAccountCanOrToken() external {
+    function testRedistributeDevRewards() external {
+        uint256 lockAmount = burnableToken.balanceOf(USER1);
+        vm.startPrank(USER1, USER1);
+        burnableToken.approve(address(burnableToken), lockAmount);
+        uint256 lockId = burnableToken.lock(lockAmount, MAX_DURATION);
+        vm.stopPrank();
+        ILockManager lockManager = burnableToken.lockManager();
+        ILockPositionsNFT positionsNFT = lockManager.positionsNFT();
+        (uint256 lockedAmount, , uint256 unlockTime, ) = positionsNFT.positions(
+            lockId
+        );
+        uint256 startAmount = burnableToken.balanceOf(address(lockManager));
+        vm.prank(DEV);
+        burnableToken.setDev(address(this));
+
+        _buyToken(BIG_DIFF, address(this));
+        _sellToken(burnableToken.balanceOf(address(this)), address(this));
+        feeAccount.collectFeesAndDistribute(payable(address(burnableToken)));
+
+        assertEq(positionsNFT.balanceOf(DEV), 0);
+        assertLe(
+            (burnableToken.balanceOf(address(lockManager)) - startAmount) -
+                lockManager.collectableRewardOf(lockId),
+            1
+        );
+    }
+
+    function testRedistributeRewardsRevertsIfNotFeeAccount() external {
+        (, ILockManager lockManager, ) = testUserCanLockToken();
+
+        vm.expectRevert(ILockManager.LockManager__NotFeeAccount.selector);
+        lockManager.redistributeRewards(BIG_DIFF);
+    }
+
+    function testDistributeRewardsRevertsIfNotPreApproved() external {
         (, ILockManager lockManager, ) = testUserCanLockToken();
 
         vm.expectRevert(
-            ILockManager.LockManager__NotFeeAccountOrToken.selector
+            abi.encodeWithSelector(
+                IERC20Errors.ERC20InsufficientAllowance.selector,
+                address(lockManager),
+                0,
+                BIG_DIFF
+            )
         );
         lockManager.distributeRewards(BIG_DIFF);
     }

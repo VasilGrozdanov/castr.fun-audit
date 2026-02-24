@@ -315,23 +315,25 @@ contract FeeAccount is
                 // Successfully transferred the lock NFT to the dev
             } catch {
                 // If transfer fails, we distribute the reward to the holders of the lock positions NFT
-                burnableToken.lockManager().distributeRewards(devRewardAmount);
+                burnableToken.lockManager().redistributeRewards(lockId);
             }
-        }
-        if (lockRewardAmount > 0) {
-            ILockManager lockManager = burnableToken.lockManager();
-            address to = address(burnableToken);
-            if (address(lockManager) != address(0)) {
-                to = address(lockManager);
-                lockManager.distributeRewards(lockRewardAmount);
-            }
-            burnableToken.transfer(to, lockRewardAmount);
         }
         if (dividendAmount > 0) {
             weth.withdraw(dividendAmount);
             totalAccummulatedWethAmounts -= accummulatedWethAmounts[token];
             accummulatedWethAmounts[token] = 0;
             burnableToken.distributeDividends{value: dividendAmount}();
+        }
+        if (lockRewardAmount > 0) {
+            ILockManager lockManager = burnableToken.lockManager();
+            if (address(lockManager) == address(0)) {
+                burnableToken.transfer(
+                    address(burnableToken),
+                    lockRewardAmount
+                );
+            }
+            burnableToken.approve(address(lockManager), lockRewardAmount);
+            lockManager.distributeRewards(lockRewardAmount);
         }
     }
 

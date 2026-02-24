@@ -11,9 +11,10 @@ import {IDividendToken} from "src/interfaces/IDividendToken.sol";
  */
 interface ILockManager {
     error LockManager__MustBeMoreThanZero();
-    error LockManager__NotFeeAccountOrToken();
+    error LockManager__NotFeeAccount();
     error LockManager__PoisitionNotUnlocked();
     error LockManager__NotAuthorized();
+    error LockManager__FailedToDistributeRewards();
     error LockManager__NotOwner(uint256 tokenId);
     error LockManager__LockDurationUnderMinForUnvestedAmount(
         uint256 unvestedAmount,
@@ -79,8 +80,16 @@ interface ILockManager {
     function distributeDividends() external payable;
 
     /**
+     * @notice redistributes dev rewards to the position NFT holders if the dev can't receive the rewards or is revoked.
+     * @dev Callable only by the fee account contract.
+     *
+     * @param tokenId The tokenId of the position NFT to redistribute rewards from.
+     */
+    function redistributeRewards(uint256 tokenId) external;
+
+    /**
      * @notice distributes rewards to the position NFT holders.
-     * @dev Callable only by the fee account or the token contract.
+     * @dev Pre-approval is required for the amount of tokens to distribute.
      *
      * @param amount The amount of rewards to distribute in wei.
      */
