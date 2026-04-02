@@ -2,42 +2,19 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-# solc = "0.8.21"
-# auto_detect_solc = true
+
 remappings = [
-    '@aerodrome-finance/contracts/=lib/contracts/contracts/',
     '@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/',
     "@forge-std/=lib/forge-std/",
     "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
     '@prb/math/=lib/prb-math/src/',
     '@velodrome-finance/slipstream/=lib/slipstream/contracts/',
     '@velodrome-finance/pool-launcher/=lib/pool-launcher/src',
-    '@uniswap/v3-core/=lib/v3-core/',
-    '@uniswap/swap-router-contracts/=lib/swap-router-contracts/',
-    '@uniswap/v3-periphery/=lib/v3-periphery/',
-    '@uncx-network/contracts/=lib/liquidity-locker-univ3-contracts/contracts/',
 ]
 evm_version = "shanghai"
-# evm_version = "cancun"
-# instruction_tracing = true
 
 [invariant]
 runs = 256
 depth = 64
-# runs = 1000
-# depth = 256
-fail_on_revert = true
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
-# [profile.test]
-# extra_output = [
-#     "storageLayout",
-#     "evm.bytecode.generatedSources",
-#     "evm.legacyAssembly",
-#     "evm.deployedBytecode.immutableReferences",
-# ]
-# bytecode_hash = "ipfs"
-# cbor_metadata = true
-# force = true
-# build_info = true
 
-# optimizer = false
+fail_on_revert = true
