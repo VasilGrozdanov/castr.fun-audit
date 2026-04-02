@@ -1,9 +1,0 @@
-sharedWorkspaceLockfile: true
-packages:
-  - interface
-onlyBuiltDependencies:
-  - "@tailwindcss/oxide"
-  - keccak
-  - secp256k1
-  - sharp
-  - unrs-resolver

@@ -1,9 +1,0 @@
-InitializeUnitConcreteTest
-├── When the locker is the implementation
-│   └── It should revert with {NotLocker}
-└── When the locker is not the implementation
-    ├── When the locker has already been initialized
-    │   └── It should revert with {InvalidInitialization}
-    └── When the locker has not been initialized
-        ├── It should initialize the locker state
-        └── It should set the locker owner
