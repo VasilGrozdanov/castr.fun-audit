@@ -27,7 +27,7 @@ contract LiquidityMigratorTest is Test {
     using Math for uint256;
 
     IWETH9 private weth;
-    BurnableToken private memeCoin;
+    BurnableToken private burnableToken;
     // BASE_MAINNET
     address private constant WETH_BASE_MAINNET =
         0x4200000000000000000000000000000000000006;
@@ -81,10 +81,10 @@ contract LiquidityMigratorTest is Test {
         LockManager lockManagerImpl = new LockManager();
         LockPositionsNFT lockPositionsNFTImpl = new LockPositionsNFT();
         vm.startPrank(OWNER);
-        memeCoin = new BurnableToken();
-        address clone = Clones.clone(address(memeCoin));
-        memeCoin = BurnableToken(payable(clone));
-        memeCoin.initialize(
+        burnableToken = new BurnableToken();
+        address clone = Clones.clone(address(burnableToken));
+        burnableToken = BurnableToken(payable(clone));
+        burnableToken.initialize(
             "Test",
             "TST",
             "",
@@ -96,15 +96,10 @@ contract LiquidityMigratorTest is Test {
             address(lockPositionsNFTImpl)
         );
 
-        memeCoin.setLaunched();
-        memeCoin.transfer(address(this), memeCoin.balanceOf(OWNER));
+        burnableToken.setLaunched();
+        burnableToken.transfer(address(this), burnableToken.balanceOf(OWNER));
         vm.stopPrank();
 
-        console2.log("memeCoin address:", address(memeCoin));
-        console2.log(
-            "memeCoin balance this:",
-            memeCoin.balanceOf(address(this))
-        );
         address(feeAccount).call{value: 1 ether}("");
 
         address bondingCurveStorageAdress = address(bondingCurvesStorage);
@@ -137,16 +132,12 @@ contract LiquidityMigratorTest is Test {
 
         address uniBondingCurvesStorage = liquidityMigrator
             .getBondingCurveStorage();
-        console2.log(
-            "bondingfactory balance before:",
-            uniBondingCurvesStorage.balance
-        );
         uniBondingCurvesStorage.call{value: 10 ether}("");
-        memeCoin.transfer(uniBondingCurvesStorage, memeCoinAmount);
+        burnableToken.transfer(uniBondingCurvesStorage, memeCoinAmount);
         vm.startPrank(uniBondingCurvesStorage);
-        memeCoin.approve(
+        burnableToken.approve(
             address(liquidityMigrator),
-            memeCoin.balanceOf(uniBondingCurvesStorage)
+            burnableToken.balanceOf(uniBondingCurvesStorage)
         );
         (
             uint256 tokenId,
@@ -156,31 +147,16 @@ contract LiquidityMigratorTest is Test {
             address locker
         ) = liquidityMigrator.createPoolAndLockLiquidity{
                 value: wethAMount + LOCK_FLAT_FEE
-            }(payable(address(memeCoin)), memeCoinAmount);
+            }(payable(address(burnableToken)), memeCoinAmount);
         vm.stopPrank();
         liquidity += liquidityDelta;
         address POSITION_MANAGER_BASE = 0x827922686190790b37229fd06084350E74485b72;
         IERC721 lpNft = IERC721(POSITION_MANAGER_BASE);
-        console2.log("--- Mint new position ---");
-        console2.log(
-            "bondingfactory balance after:",
-            uniBondingCurvesStorage.balance
-        );
-        console2.log("token id", tokenId);
-        console2.log("liquidity", liquidity);
-        console2.log("amount 0", amount0);
-        console2.log("amount 1", amount1);
-        console2.log("locker", locker);
-        console2.log(
-            "balance memeCoin this",
-            memeCoin.balanceOf(address(this))
-        );
-        console2.log("balance weth this", weth.balanceOf(address(this)));
-        console2.log("ownerOf nft", lpNft.ownerOf(tokenId));
+
         vm.startPrank(uniBondingCurvesStorage);
         address pool = ICLFactory(FACTORY_BASE_MAINNET).getPool(
             WETH_BASE_MAINNET,
-            address(memeCoin),
+            address(burnableToken),
             2000
         );
         ICLPool(pool).collect(
@@ -196,54 +172,31 @@ contract LiquidityMigratorTest is Test {
     function testReward() public mainnetOnly {
         testLiquidity();
         rewardResolverMock.setState(RewardResolverMock.State.WAITING);
-        rewardResolverMock.setWinner(address(memeCoin));
+        rewardResolverMock.setWinner(address(burnableToken));
         rewardResolverMock.fulfillRequest(
             bytes32(uint256(0)),
-            abi.encode(address(memeCoin)),
+            abi.encode(address(burnableToken)),
             ""
         );
-        console2.log(
-            "rewardResolverMock state:",
-            uint256(rewardResolverMock.getState())
-        );
-        console2.log("eth balance feeAccount:", address(feeAccount).balance);
-        console2.log(
-            "weth balance feeAccount:",
-            weth.balanceOf(address(feeAccount))
-        );
         FeeAccount.TokenRefferences memory tokenRefferences = feeAccount
-            .getCompetingTokenRefferences(address(memeCoin));
+            .getCompetingTokenRefferences(address(burnableToken));
         (uint160 sqrtPriceX96Start, int24 tickStart, , , , ) = tokenRefferences
             .pool
             .slot0();
-        console2.log("start sqrtPriceX96:", sqrtPriceX96Start);
-        console2.log("start tick:", tickStart);
-        console2.log(
-            "start balance treasury:",
-            address(feeAccount.treasury()).balance
-        );
-        console2.log("start balance feeAccount:", address(feeAccount).balance);
         feeAccount.performUpkeep("");
         (uint160 sqrtPriceX96End, int24 tickEnd, , , , ) = tokenRefferences
             .pool
             .slot0();
-        console2.log("end sqrtPriceX96:", sqrtPriceX96End);
-        console2.log("end tick:", tickEnd);
-        console2.log(
-            "end balance treasury:",
-            address(feeAccount.treasury()).balance
-        );
-        console2.log("end balance feeAccount:", address(feeAccount).balance);
         assertEq(
             uint256(rewardResolverMock.getState()),
             uint256(RewardResolverMock.State.OPEN)
         );
-        if (address(weth) > address(memeCoin)) {
+        if (address(weth) > address(burnableToken)) {
             assertGt(tickEnd, tickStart);
         } else {
             assertLt(tickEnd, tickStart);
         }
-        assertEq(0, memeCoin.balanceOf(address(feeAccount)));
+        assertEq(0, burnableToken.balanceOf(address(feeAccount)));
         assertEq(0, address(feeAccount).balance);
         assertGt(address(feeAccount.treasury()).balance, 0);
     }
@@ -252,7 +205,7 @@ contract LiquidityMigratorTest is Test {
         testLiquidity();
 
         FeeAccount.TokenRefferences memory tokenRefferences = feeAccount
-            .getCompetingTokenRefferences(address(memeCoin));
+            .getCompetingTokenRefferences(address(burnableToken));
         uint256 amountIn = 10 ether;
         weth.deposit{value: amountIn}();
         weth.approve(swapRouter, amountIn);
@@ -260,7 +213,7 @@ contract LiquidityMigratorTest is Test {
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
             .ExactInputSingleParams({
                 tokenIn: address(weth),
-                tokenOut: address(memeCoin),
+                tokenOut: address(burnableToken),
                 tickSpacing: tokenRefferences.pool.tickSpacing(),
                 recipient: address(this),
                 deadline: block.timestamp,
@@ -271,14 +224,17 @@ contract LiquidityMigratorTest is Test {
 
         ISwapRouter(swapRouter).exactInputSingle(params);
 
-        memeCoin.approve(swapRouter, memeCoin.balanceOf(address(this)));
+        burnableToken.approve(
+            swapRouter,
+            burnableToken.balanceOf(address(this))
+        );
         params = ISwapRouter.ExactInputSingleParams({
-            tokenIn: address(memeCoin),
+            tokenIn: address(burnableToken),
             tokenOut: address(weth),
             tickSpacing: tokenRefferences.pool.tickSpacing(),
             recipient: address(this),
             deadline: block.timestamp,
-            amountIn: memeCoin.balanceOf(address(this)),
+            amountIn: burnableToken.balanceOf(address(this)),
             amountOutMinimum: 0,
             sqrtPriceLimitX96: 0
         });
@@ -287,26 +243,25 @@ contract LiquidityMigratorTest is Test {
         uint256 startingBalanceUser = weth.balanceOf(USER);
         address treasuryAddress = feeAccount.treasury();
         uint256 startingBalanceTreasury = weth.balanceOf(treasuryAddress);
-        uint256 startingDividends = address(memeCoin).balance;
+        uint256 startingDividends = address(burnableToken).balance;
 
         vm.prank(USER);
-        feeAccount.collectFeesAndDistribute(payable(address(memeCoin)));
+        feeAccount.collectFeesAndDistribute(payable(address(burnableToken)));
 
-        ILockManager lockManager = memeCoin.lockManager();
-        console2.log("is meme gt weth?", address(memeCoin) > address(weth));
+        ILockManager lockManager = burnableToken.lockManager();
 
         assertTrue(address(lockManager) != address(0));
-        assertGt(memeCoin.balanceOf(address(lockManager)), 0);
+        assertGt(burnableToken.balanceOf(address(lockManager)), 0);
         assertGt(lockManager.positionsNFT().balanceOf(OWNER), 0);
         assertGt(weth.balanceOf(treasuryAddress), startingBalanceTreasury);
-        assertGt(address(memeCoin).balance, startingDividends);
+        assertGt(address(burnableToken).balance, startingDividends);
     }
 
     function testCollectFeesNoTreasuryAmount() public {
         testLiquidity();
 
         FeeAccount.TokenRefferences memory tokenRefferences = feeAccount
-            .getCompetingTokenRefferences(address(memeCoin));
+            .getCompetingTokenRefferences(address(burnableToken));
         uint256 amountIn = 500;
         weth.deposit{value: amountIn}();
         weth.approve(swapRouter, amountIn);
@@ -314,7 +269,7 @@ contract LiquidityMigratorTest is Test {
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
             .ExactInputSingleParams({
                 tokenIn: address(weth),
-                tokenOut: address(memeCoin),
+                tokenOut: address(burnableToken),
                 tickSpacing: tokenRefferences.pool.tickSpacing(),
                 recipient: address(this),
                 deadline: block.timestamp,
@@ -325,9 +280,12 @@ contract LiquidityMigratorTest is Test {
 
         ISwapRouter(swapRouter).exactInputSingle(params);
 
-        memeCoin.approve(swapRouter, memeCoin.balanceOf(address(this)));
+        burnableToken.approve(
+            swapRouter,
+            burnableToken.balanceOf(address(this))
+        );
         params = ISwapRouter.ExactInputSingleParams({
-            tokenIn: address(memeCoin),
+            tokenIn: address(burnableToken),
             tokenOut: address(weth),
             tickSpacing: tokenRefferences.pool.tickSpacing(),
             recipient: address(this),
@@ -338,46 +296,49 @@ contract LiquidityMigratorTest is Test {
         });
 
         ISwapRouter(swapRouter).exactInputSingle(params);
-        uint256 startingLockingRewards = memeCoin.balanceOf(address(memeCoin));
-        uint256 startingOwnerRewards = memeCoin.balanceOf(OWNER);
+        uint256 startingLockingRewards = burnableToken.balanceOf(
+            address(burnableToken)
+        );
+        uint256 startingOwnerRewards = burnableToken.balanceOf(OWNER);
         uint256 startingBalanceUser = weth.balanceOf(USER);
         address treasuryAddress = feeAccount.treasury();
         uint256 startingBalanceTreasury = weth.balanceOf(treasuryAddress);
-        uint256 startingDividends = address(memeCoin).balance;
+        uint256 startingDividends = address(burnableToken).balance;
         uint256 startingFeeAccountWethBalance = weth.balanceOf(
             address(feeAccount)
         );
-        uint256 startingFeeAccountTokenBalance = memeCoin.balanceOf(
+        uint256 startingFeeAccountTokenBalance = burnableToken.balanceOf(
             address(feeAccount)
         );
 
         vm.prank(USER);
-        feeAccount.collectFeesAndDistribute(payable(address(memeCoin)));
+        feeAccount.collectFeesAndDistribute(payable(address(burnableToken)));
 
-        console2.log("is meme gt weth?", address(memeCoin) > address(weth));
-
-        assertTrue(address(memeCoin.lockManager()) == address(0));
-        assertEq(memeCoin.balanceOf(address(memeCoin)), startingLockingRewards);
-        assertEq(memeCoin.balanceOf(address(OWNER)), startingOwnerRewards);
+        assertTrue(address(burnableToken.lockManager()) == address(0));
+        assertEq(
+            burnableToken.balanceOf(address(burnableToken)),
+            startingLockingRewards
+        );
+        assertEq(burnableToken.balanceOf(address(OWNER)), startingOwnerRewards);
         assertEq(weth.balanceOf(USER), startingBalanceUser);
         assertEq(weth.balanceOf(treasuryAddress), startingBalanceTreasury);
-        assertEq(address(memeCoin).balance, startingDividends);
+        assertEq(address(burnableToken).balance, startingDividends);
         assertGt(
             weth.balanceOf(address(feeAccount)),
             startingFeeAccountWethBalance
         );
         assertGt(
-            memeCoin.balanceOf(address(feeAccount)),
+            burnableToken.balanceOf(address(feeAccount)),
             startingFeeAccountTokenBalance
         );
-        assertGt(feeAccount.accummulatedWethAmounts(address(memeCoin)), 0);
+        assertGt(feeAccount.accummulatedWethAmounts(address(burnableToken)), 0);
     }
 
     function testCollectFeesAccumulatedWethAmount() external {
         testCollectFeesNoTreasuryAmount();
 
         FeeAccount.TokenRefferences memory tokenRefferences = feeAccount
-            .getCompetingTokenRefferences(address(memeCoin));
+            .getCompetingTokenRefferences(address(burnableToken));
         uint256 amountIn = 1 ether;
         weth.deposit{value: amountIn}();
         weth.approve(swapRouter, amountIn);
@@ -385,7 +346,7 @@ contract LiquidityMigratorTest is Test {
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
             .ExactInputSingleParams({
                 tokenIn: address(weth),
-                tokenOut: address(memeCoin),
+                tokenOut: address(burnableToken),
                 tickSpacing: tokenRefferences.pool.tickSpacing(),
                 recipient: address(this),
                 deadline: block.timestamp,
@@ -396,14 +357,17 @@ contract LiquidityMigratorTest is Test {
 
         ISwapRouter(swapRouter).exactInputSingle(params);
 
-        memeCoin.approve(swapRouter, memeCoin.balanceOf(address(this)));
+        burnableToken.approve(
+            swapRouter,
+            burnableToken.balanceOf(address(this))
+        );
         params = ISwapRouter.ExactInputSingleParams({
-            tokenIn: address(memeCoin),
+            tokenIn: address(burnableToken),
             tokenOut: address(weth),
             tickSpacing: tokenRefferences.pool.tickSpacing(),
             recipient: address(this),
             deadline: block.timestamp,
-            amountIn: memeCoin.balanceOf(address(this)),
+            amountIn: burnableToken.balanceOf(address(this)),
             amountOutMinimum: 0,
             sqrtPriceLimitX96: 0
         });
@@ -412,20 +376,19 @@ contract LiquidityMigratorTest is Test {
         uint256 startingBalanceUser = weth.balanceOf(USER);
         address treasuryAddress = feeAccount.treasury();
         uint256 startingBalanceTreasury = weth.balanceOf(treasuryAddress);
-        uint256 startingDividends = address(memeCoin).balance;
+        uint256 startingDividends = address(burnableToken).balance;
 
         vm.prank(USER);
-        feeAccount.collectFeesAndDistribute(payable(address(memeCoin)));
+        feeAccount.collectFeesAndDistribute(payable(address(burnableToken)));
 
-        ILockManager lockManager = memeCoin.lockManager();
-        console2.log("is meme gt weth?", address(memeCoin) > address(weth));
+        ILockManager lockManager = burnableToken.lockManager();
 
         assertTrue(address(lockManager) != address(0));
-        assertGt(memeCoin.balanceOf(address(lockManager)), 0);
+        assertGt(burnableToken.balanceOf(address(lockManager)), 0);
         assertGt(lockManager.positionsNFT().balanceOf(OWNER), 0);
         assertGt(weth.balanceOf(treasuryAddress), startingBalanceTreasury);
-        assertGt(address(memeCoin).balance, startingDividends);
-        assertEq(memeCoin.balanceOf(address(feeAccount)), 0);
-        assertEq(feeAccount.accummulatedWethAmounts(address(memeCoin)), 0);
+        assertGt(address(burnableToken).balance, startingDividends);
+        assertEq(burnableToken.balanceOf(address(feeAccount)), 0);
+        assertEq(feeAccount.accummulatedWethAmounts(address(burnableToken)), 0);
     }
 }
