@@ -3,8 +3,8 @@ pragma solidity ^0.8.22;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {ICLPool} from "@velodrome-finance/slipstream/core/interfaces/ICLPool.sol";
-import {INonfungiblePositionManager} from "@velodrome-finance/pool-launcher/external/INonfungiblePositionManager.sol";
+import {ICLPool} from "@aerodrome-finance/slipstream/core/interfaces/ICLPool.sol";
+import {INonfungiblePositionManager} from "src/interfaces/external/INonfungiblePositionManager.sol";
 import {ICLLockerFactory} from "@velodrome-finance/pool-launcher/interfaces/extensions/cl/ICLLockerFactory.sol";
 import {ILiquidityLocker} from "src/interfaces/ILiquidityLocker.sol";
 import {ILiquidityMigrator} from "src/interfaces/ILiquidityMigrator.sol";

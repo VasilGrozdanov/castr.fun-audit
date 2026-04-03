@@ -9,10 +9,10 @@ import {BurnableToken} from "src/BurnableToken.sol";
 import {FeeAccount} from "src/FeeAccount.sol";
 import {BondingCurvesStorage} from "src/BondingCurvesStorage.sol";
 import {FactoryManager} from "src/FactoryManager.sol";
-import {ISwapRouter} from "@velodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
+import {ISwapRouter} from "@aerodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
 import {LiquidityLocker, ILiquidityLocker} from "src/LiquidityLocker.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {ICLPool} from "@velodrome-finance/slipstream/core/interfaces/ICLPool.sol";
+import {ICLPool} from "@aerodrome-finance/slipstream/core/interfaces/ICLPool.sol";
 
 contract LockManagerTest is Test {
     uint256 constant MINIMAL_DIFF = 1 ether;
@@ -24,7 +24,7 @@ contract LockManagerTest is Test {
     BurnableToken burnableToken;
     IWETH9 weth;
     ISwapRouter swapRouter;
-    address USER = address(1);
+    address USER = makeAddr("castr_test_user_unique");
     string constant ID = "1";
     bytes metadata =
         abi.encode(

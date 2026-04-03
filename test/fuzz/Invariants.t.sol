@@ -9,7 +9,7 @@ import {BurnableToken} from "src/BurnableToken.sol";
 import {FeeAccount} from "src/FeeAccount.sol";
 import {BondingCurvesStorage} from "src/BondingCurvesStorage.sol";
 import {FactoryManager} from "src/FactoryManager.sol";
-import {ISwapRouter} from "@velodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
+import {ISwapRouter} from "@aerodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
 import {StdInvariant} from "forge-std/StdInvariant.sol";
 import {Handler} from "test/fuzz/Handler.t.sol";
 
@@ -21,9 +21,9 @@ contract Invariants is StdInvariant, Test {
     FeeAccount feeAccount;
     ISwapRouter swapRouter;
     IWETH9 weth;
-    address USER1 = makeAddr("user1");
-    address USER2 = makeAddr("user2");
-    address DEV = makeAddr("dev");
+    address USER1 = makeAddr("castr_test_user_1_unique");
+    address USER2 = makeAddr("castr_test_user_2_unique");
+    address DEV = makeAddr("castr_test_user_dev_unique");
     BurnableToken burnableToken;
     Handler handler;
     string constant ID = "1";

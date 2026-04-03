@@ -14,7 +14,7 @@ import {LockPositionsNFT} from "src/LockPositionsNFT.sol";
 import {LockManager} from "src/LockManager.sol";
 
 contract FactoryManagerTest is Test {
-    address DEV = makeAddr("dev");
+    address DEV = makeAddr("castr_test_user_dev_unique");
     address FEE_ACCOUNT = makeAddr("feeAccount");
     string TOKEN_NAME = "Test";
     string TOKEN_SYMBOL = "TEST";

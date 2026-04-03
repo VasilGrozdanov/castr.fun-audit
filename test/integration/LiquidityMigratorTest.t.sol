@@ -9,7 +9,7 @@ import {BondingCurve} from "src/BondingCurve.sol";
 import {BurnableToken} from "src/BurnableToken.sol";
 import {FeeAccount} from "src/FeeAccount.sol";
 import {AddressChecker} from "src/AddressChecker.sol";
-import {TickMath} from "@uncx-network/contracts/uniswap-updated/TickMath.sol";
+import {TickMath} from "@beefyfinance/beefy-contracts/BIFI/utils/TickMath.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {BondingCurvesStorage} from "src/BondingCurvesStorage.sol";
 import {FactoryManager} from "src/FactoryManager.sol";
@@ -26,7 +26,7 @@ contract LiquidityMigratorTest is Test {
     BondingCurvesStorage bondingCurvesStorage;
     FactoryManager factoryManager;
     FeeAccount feeAccount;
-    address USER = makeAddr("user");
+    address USER = makeAddr("castr_test_user_unique");
     IWETH9 weth;
     BurnableToken memeCoin;
 

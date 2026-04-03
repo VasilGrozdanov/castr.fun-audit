@@ -5,7 +5,7 @@ import {Test, console2} from "forge-std/Test.sol";
 import {BurnableToken} from "src/BurnableToken.sol";
 import {FeeAccount} from "src/FeeAccount.sol";
 import {IWETH9} from "src/LiquidityMigrator.sol";
-import {ISwapRouter} from "@velodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
+import {ISwapRouter} from "@aerodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
 import {Invariants} from "test/fuzz/Invariants.t.sol";
 
 //Narrows down the way we call functioions
@@ -42,12 +42,12 @@ contract Handler is Test {
         feeAccount = _feeAccount;
         invariant = Invariants(_invariant);
 
-        address user = makeAddr("user3");
+        address user = makeAddr("castr_test_user_3_unique");
         vm.deal(user, 1000 ether);
         invariant.swapToken(1 ether, user, true);
         isHolder[user] = true;
         holders.push(user);
-        user = makeAddr("user4");
+        user = makeAddr("castr_test_user_4_unique");
         vm.deal(user, 1000 ether);
         invariant.swapToken(1 ether, user, true);
         isHolder[user] = true;

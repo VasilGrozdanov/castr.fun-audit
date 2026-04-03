@@ -1,28 +1,27 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.22;
+pragma solidity >=0.8.22 <0.9.0;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {LiquidityMigrator, IWETH9} from "src/LiquidityMigrator.sol";
 import {BondingCurvesStorageMock} from "test/mocks/BondingCurvesStorageMock.t.sol";
 import {RewardResolverMock} from "test/mocks/RewardResolverMock.t.sol";
+import {ISwapRouter} from "@aerodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
+import {ICLPool} from "@aerodrome-finance/slipstream/core/interfaces/ICLPool.sol";
+import {TickMath} from "@beefyfinance/beefy-contracts/BIFI/utils/TickMath.sol";
+import {INonfungiblePositionManager} from "src/interfaces/external/INonfungiblePositionManager.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {LiquidityMigrator, IWETH9} from "src/LiquidityMigrator.sol";
 import {BurnableToken} from "src/BurnableToken.sol";
 import {FeeAccount} from "src/FeeAccount.sol";
-import {ISwapRouter} from "@velodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
 import {BondingCurvesStorage} from "src/BondingCurvesStorage.sol";
 import {LockManager, ILockManager} from "src/LockManager.sol";
 import {LockPositionsNFT} from "src/LockPositionsNFT.sol";
 import {AddressChecker} from "src/AddressChecker.sol";
-import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {ICLPool} from "@velodrome-finance/slipstream/core/interfaces/ICLPool.sol";
-import {ICLFactory} from "@velodrome-finance/slipstream/core/interfaces/ICLFactory.sol";
-import {TickMath} from "@uncx-network/contracts/uniswap-updated/TickMath.sol";
-import {INonfungiblePositionManager} from "@velodrome-finance/slipstream/periphery/interfaces/INonfungiblePositionManager.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {ICLLockerFactory} from "@velodrome-finance/pool-launcher/interfaces/extensions/cl/ICLLockerFactory.sol";
 import {LiquidityLocker} from "src/LiquidityLocker.sol";
+import {ICLFactory} from "src/interfaces/external/ICLFactory.sol";
 
 contract LiquidityMigratorTest is Test {
     using Math for uint256;
@@ -53,8 +52,8 @@ contract LiquidityMigratorTest is Test {
     uint256 memeCoinAmount = 200e6 ether;
     FeeAccount feeAccount;
     address treasury;
-    address USER = makeAddr("user");
-    address BENEFICIARY = makeAddr("beneficiary");
+    address USER = makeAddr("castr_test_user_unique");
+    address BENEFICIARY = makeAddr("castr_test_beneficiary_unique");
     address OWNER = address(0x3b195607a32C41bD613d48BAb5a9a7761022D4C3);
     // address OWNER = makeAddr("owner");
     address[] dexes;

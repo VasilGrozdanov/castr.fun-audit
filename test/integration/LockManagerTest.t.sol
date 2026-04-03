@@ -9,7 +9,7 @@ import {BurnableToken} from "src/BurnableToken.sol";
 import {FeeAccount} from "src/FeeAccount.sol";
 import {BondingCurvesStorage} from "src/BondingCurvesStorage.sol";
 import {FactoryManager} from "src/FactoryManager.sol";
-import {ISwapRouter} from "@velodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
+import {ISwapRouter} from "@aerodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
 import {LockManager, ILockManager} from "src/LockManager.sol";
 import {ILockPositionsNFT} from "src/interfaces/ILockPositionsNFT.sol";
 import {IERC721Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
@@ -39,9 +39,9 @@ contract LockManagerTest is Test {
     IWETH9 weth;
     ISwapRouter swapRouter;
     uint256 VESTING_DURATION_USER1 = 12_050_233; // update if USER1 share or duration calculation is changed
-    address USER1 = address(1);
-    address USER2 = address(2);
-    address DEV = address(3);
+    address USER1 = makeAddr("castr_test_user_1_unique");
+    address USER2 = makeAddr("castr_test_user_2_unique");
+    address DEV = makeAddr("castr_test_dev_unique");
     string constant ID = "1";
     bytes metadata =
         abi.encode(

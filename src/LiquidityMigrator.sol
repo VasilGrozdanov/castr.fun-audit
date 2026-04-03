@@ -4,16 +4,15 @@ pragma solidity 0.8.22;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {INonfungiblePositionManager} from "@velodrome-finance/slipstream/periphery/interfaces/INonfungiblePositionManager.sol";
-import {TickMath} from "@velodrome-finance/slipstream/core/libraries/TickMath.sol";
-import {ICLFactory} from "@velodrome-finance/slipstream/core/interfaces/ICLFactory.sol";
-import {ICLPool} from "@velodrome-finance/slipstream/core/interfaces/ICLPool.sol";
+import {INonfungiblePositionManager} from "src/interfaces/external/INonfungiblePositionManager.sol";
+import {TickMath} from "@beefyfinance/beefy-contracts/BIFI/utils/TickMath.sol";
+import {ICLPool} from "@aerodrome-finance/slipstream/core/interfaces/ICLPool.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {ICLFactory} from "src/interfaces/external/ICLFactory.sol";
 import {BurnableToken} from "src/BurnableToken.sol";
 import {IBondingCurvesStorage} from "src/interfaces/IBondingCurvesStorage.sol";
 import {IFeeAccount} from "src/FeeAccount.sol";
 import {ILiquidityMigrator, IWETH9} from "src/interfaces/ILiquidityMigrator.sol";
-import {ICLLockerFactory} from "@velodrome-finance/pool-launcher/interfaces/extensions/cl/ICLLockerFactory.sol";
 import {ILiquidityLocker} from "src/interfaces/ILiquidityLocker.sol";
 
 contract LiquidityMigrator is Ownable, ILiquidityMigrator {

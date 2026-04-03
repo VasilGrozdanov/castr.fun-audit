@@ -11,9 +11,9 @@ import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 contract BurnableTokenTest is Test {
     BurnableToken burnableToken;
     BurnableToken devLockedBurnableToken;
-    address USER = makeAddr("user");
-    address OWNER = makeAddr("owner");
-    address DEX = makeAddr("dex");
+    address USER = makeAddr("castr_test_user_unique");
+    address OWNER = makeAddr("castr_test_owner_unique");
+    address DEX = makeAddr("castr_test_dex_unique");
     uint256 GOAL_AMOUNT = 4.5 ether;
     address[] dexes;
 

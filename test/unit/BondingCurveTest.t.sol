@@ -20,7 +20,7 @@ contract BondingCurveTest is Test {
     IBurnableTokenActions burnableToken;
     BondingCurve bondingCurve;
     LiquidityMigratorMock liquidityMigrator;
-    address USER = makeAddr("user");
+    address USER = makeAddr("castr_test_user_unique");
     address FEE_ACCOUNT = makeAddr("feeAccount");
     uint256 maxLockDuration;
     BondingCurveFactory bondingCurveFactory;

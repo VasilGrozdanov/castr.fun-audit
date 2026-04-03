@@ -2,8 +2,8 @@
 pragma solidity ^0.8.22;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ICLPool} from "@velodrome-finance/slipstream/core/interfaces/ICLPool.sol";
-import {INonfungiblePositionManager} from "@velodrome-finance/slipstream/periphery/interfaces/INonfungiblePositionManager.sol";
+import {ICLPool} from "@aerodrome-finance/slipstream/core/interfaces/ICLPool.sol";
+import {INonfungiblePositionManager} from "src/interfaces/external/INonfungiblePositionManager.sol";
 import {ILiquidityLocker} from "src/interfaces/ILiquidityLocker.sol";
 
 interface IWETH9 is IERC20 {

@@ -19,8 +19,8 @@ contract SoulboundNFTTest is Test {
         "data:application/json;base64,eyJuYW1lIjogIkJhc2VkIENhc3RlcnMiLCJkZXNjcmlwdGlvbiI6ICJBIGJhZGdlIG9mIGhvbm91ciBmb3IgYmFzZWQgY3JlYXRvcnMgYW5kIHN1cHBvcnRlcnMgb2YgdGhlIHByb2plY3QgY2FzdHIuZnVuLiBPd25lcnMgb2YgdGhpcyBORlQgaGF2ZSBzcGVjaWFsIHByaXZpbGVnZXMgaW4gdGhlIGVjb3N5c3RlbS5cblxu4pqg77iPIERJU0NMQUlNRVI6IFRoaXMgTkZUIGlzIHNvdWxib3VuZCBhbmQgY2Fubm90IGJlIHRyYW5zZmVycmVkIG9yIHNvbGQuIEl0IGlzIHBlcm1hbmVudGx5IGJvdW5kIHRvIHRoZSBhZGRyZXNzIG9mIHRoZSBvd25lci4iLCAiaW1hZ2UiOiAiaXBmcy9pbWFnZS5naWYiLCAiYW5pbWF0aW9uX3VybCI6ICJpcGZzL2FuaW1hdGlvbi5tcDQiLCAiZXh0ZXJuYWxfdXJsIjogImh0dHBzOi8vY2FzdHIuZnVuIiwgImF0dHJpYnV0ZXMiOiBbeyAiZGlzcGxheV90eXBlIjogImRhdGUiLCAgInRyYWl0X3R5cGUiOiAicmVjaWV2ZWQiLCAidmFsdWUiOiAxNzUxNDkyNDY1fV19";
     uint256 constant TIMESTAMP = 1751492465; // Example timestamp for testing
     SoulboundNFT soulboundNFT;
-    address OWNER = makeAddr("owner");
-    address USER = makeAddr("user");
+    address OWNER = makeAddr("castr_test_owner_unique");
+    address USER = makeAddr("castr_test_user_unique");
 
     function setUp() public {
         vm.prank(OWNER);

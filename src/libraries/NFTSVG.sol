@@ -3,7 +3,7 @@ pragma solidity ^0.8.22;
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
-import {BitMath} from "@velodrome-finance/slipstream/core/libraries/BitMath.sol";
+import {BitMath} from "@aerodrome-finance/slipstream/core/libraries/BitMath.sol";
 
 library NFTSVG {
     using Strings for uint256;

@@ -2,22 +2,22 @@
 pragma solidity 0.8.22;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ISwapRouter} from "@velodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
-import {ICLPool} from "@velodrome-finance/slipstream/core/interfaces/ICLPool.sol";
+import {ISwapRouter} from "@aerodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
+import {ICLPool} from "@aerodrome-finance/slipstream/core/interfaces/ICLPool.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import {ILocker} from "@velodrome-finance/pool-launcher/interfaces/ILocker.sol";
-import {OracleLibrary} from "@velodrome-finance/slipstream/periphery/libraries/OracleLibrary.sol";
+import {ILocker} from "src/interfaces/external/ILocker.sol";
 import {BurnableToken} from "src/BurnableToken.sol";
 import {ILiquidityMigrator, IWETH9} from "src/interfaces/ILiquidityMigrator.sol";
 import {RewardResolver} from "src/RewardResolver.sol";
 import {ILockManager} from "src/interfaces/ILockManager.sol";
 import {ILiquidityLocker} from "src/interfaces/ILiquidityLocker.sol";
 import {IFeeAccount} from "src/interfaces/IFeeAccount.sol";
+import {OracleLibrary} from "src/libraries/utils/OracleLibrary.sol";
 
 contract FeeAccount is
     ReentrancyGuard,

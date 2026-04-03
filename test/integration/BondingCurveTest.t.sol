@@ -7,7 +7,7 @@ import {LiquidityMigrator} from "src/LiquidityMigrator.sol";
 import {BondingCurve} from "src/BondingCurve.sol";
 import {IBurnableTokenActions, IBurnableTokenContext} from "src/BurnableToken.sol";
 import {FeeAccount} from "src/FeeAccount.sol";
-import {TickMath} from "@uncx-network/contracts/uniswap-updated/TickMath.sol";
+import {TickMath} from "@beefyfinance/beefy-contracts/BIFI/utils/TickMath.sol";
 import {BancorBondingCurve} from "src/BancorBondingCurve.sol";
 import {BondingCurvesStorage} from "src/BondingCurvesStorage.sol";
 import {FactoryManager} from "src/FactoryManager.sol";
@@ -22,8 +22,8 @@ contract BondingCurveTest is Test {
     BondingCurvesStorage bondingCurvesStorage;
     FactoryManager factoryManager;
     FeeAccount feeAccount;
-    address USER1 = address(1);
-    address USER2 = address(2);
+    address USER1 = makeAddr("castr_test_user_1_unique");
+    address USER2 = makeAddr("castr_test_user_2_unique");
     string constant ID = "1";
     bytes metadata =
         abi.encode(

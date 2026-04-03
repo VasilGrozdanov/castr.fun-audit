@@ -9,7 +9,7 @@ import {BurnableToken, IBurnableTokenContext} from "src/BurnableToken.sol";
 import {FeeAccount, IFeeAccount} from "src/FeeAccount.sol";
 import {BondingCurvesStorage} from "src/BondingCurvesStorage.sol";
 import {FactoryManager} from "src/FactoryManager.sol";
-import {ISwapRouter} from "@velodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
+import {ISwapRouter} from "@aerodrome-finance/slipstream/periphery/interfaces/ISwapRouter.sol";
 
 contract SmartWalletMock {
     receive() external payable {}
@@ -25,9 +25,9 @@ contract BurnableTokenTest is Test {
     BurnableToken burnableToken;
     IWETH9 weth;
     ISwapRouter swapRouter;
-    address USER1 = address(1);
-    address USER2 = address(2);
-    address DEV = makeAddr("dev");
+    address USER1 = makeAddr("castr_test_user_1_unique");
+    address USER2 = makeAddr("castr_test_user_2_unique");
+    address DEV = makeAddr("castr_test_user_dev_unique");
     SmartWalletMock smartWalletMock;
     uint256 VESTING_DURATION_DEV = 6_840_004; // update if DEV share or duration calculation is changed
     string constant ID = "1";

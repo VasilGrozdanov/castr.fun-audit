@@ -1,9 +1,9 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import {TickMath} from "@velodrome-finance/slipstream/core/libraries/TickMath.sol";
+import {TickMath} from "@beefyfinance/beefy-contracts/BIFI/utils/TickMath.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {HexStrings} from "@velodrome-finance/slipstream/periphery/libraries/HexStrings.sol";
+import {HexStrings} from "src/libraries/utils/HexStrings.sol";
 import {NFTSVG} from "src/libraries/NFTSVG.sol";
 
 library NFTDescriptor {

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.22;
+pragma solidity >=0.8.22 <0.9.0;
 
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {BondingCurve} from "src/BondingCurve.sol";
@@ -14,7 +14,7 @@ import {LockManager} from "src/LockManager.sol";
 import {LockPositionsNFT} from "src/LockPositionsNFT.sol";
 
 contract FactoryManagerTest is Test {
-    address DEV = makeAddr("dev");
+    address DEV = makeAddr("castr_test_user_dev_unique");
     address FEE_ACCOUNT = makeAddr("feeAccount");
     string TOKEN_NAME = "Test";
     string TOKEN_SYMBOL = "TEST";

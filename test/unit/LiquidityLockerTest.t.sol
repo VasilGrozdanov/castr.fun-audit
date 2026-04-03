@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.22;
+pragma solidity >=0.8.22 <0.9.0;
 
 import {Test} from "forge-std/Test.sol";
 import {LiquidityMigrator} from "src/LiquidityMigrator.sol";
@@ -9,7 +9,7 @@ import {LiquidityLocker, ILiquidityLocker} from "src/LiquidityLocker.sol";
 contract LockManagerTest is Test {
     address liquidityMigrator = makeAddr("liquidityMigrator");
     address feeAccount = makeAddr("feeAccount");
-    address USER = makeAddr("user");
+    address USER = makeAddr("castr_test_user_unique");
     LiquidityLocker liquidityLocker;
 
     function setUp() external {

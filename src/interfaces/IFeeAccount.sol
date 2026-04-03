@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
-import {ICLPool} from "@velodrome-finance/slipstream/core/interfaces/ICLPool.sol";
+import {ICLPool} from "@aerodrome-finance/slipstream/core/interfaces/ICLPool.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IBurnableTokenActions} from "src/interfaces/IBurnableTokenActions.sol";
 import {RewardResolver} from "src/RewardResolver.sol";

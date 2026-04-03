@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.22;
+pragma solidity >=0.8.22 <0.9.0;
 
 import {BondingCurve, IBondingCurve} from "src/BondingCurve.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
