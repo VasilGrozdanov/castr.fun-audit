@@ -42,10 +42,8 @@ contract LiquidityMigratorTest is Test {
     LiquidityMigrator private liquidityMigrator;
     RewardResolverMock private rewardResolverMock;
     address private swapRouter;
-    // uint256 wethAMount = 0.88464072039665031 ether;
-    // uint256 memeCoinAMount = 68999999999999999962711485162;
     address public keeperRegistry =
-        address(0x86EFBD0b6736Bed994962f9797049422A3A8E8Ad); //  hardcoded for Eth sepolia
+        address(0xf4bAb6A129164aBa9B113cB96BA4266dF49f8743); //  hardcoded for Base mainnet
     uint256 public minWaitPeriod = 24 hours;
     uint256 wethAMount = 4.5 ether;
     uint256 LOCK_FLAT_FEE = 0.03 ether;
@@ -55,7 +53,6 @@ contract LiquidityMigratorTest is Test {
     address USER = makeAddr("castr_test_user_unique");
     address BENEFICIARY = makeAddr("castr_test_beneficiary_unique");
     address OWNER = address(0x3b195607a32C41bD613d48BAb5a9a7761022D4C3);
-    // address OWNER = makeAddr("owner");
     address[] dexes;
 
     receive() external payable {}
@@ -110,8 +107,6 @@ contract LiquidityMigratorTest is Test {
         );
         address(feeAccount).call{value: 1 ether}("");
 
-        // dai = IERC20(0x2F573070E6090b3264Fe707e2C9F201716F123c7);
-        // dai = new BurnableToken("Test", "T");
         address bondingCurveStorageAdress = address(bondingCurvesStorage);
         liquidityMigrator = new LiquidityMigrator(
             payable(address(feeAccount)),
@@ -140,7 +135,6 @@ contract LiquidityMigratorTest is Test {
         // Track total liquidity
         uint128 liquidity;
 
-        // uint256 startingEthBalance = address(this).balance;
         address uniBondingCurvesStorage = liquidityMigrator
             .getBondingCurveStorage();
         console2.log(
@@ -304,7 +298,6 @@ contract LiquidityMigratorTest is Test {
         assertTrue(address(lockManager) != address(0));
         assertGt(memeCoin.balanceOf(address(lockManager)), 0);
         assertGt(lockManager.positionsNFT().balanceOf(OWNER), 0);
-        // assertGt(weth.balanceOf(USER), startingBalanceUser);
         assertGt(weth.balanceOf(treasuryAddress), startingBalanceTreasury);
         assertGt(address(memeCoin).balance, startingDividends);
     }
@@ -430,7 +423,6 @@ contract LiquidityMigratorTest is Test {
         assertTrue(address(lockManager) != address(0));
         assertGt(memeCoin.balanceOf(address(lockManager)), 0);
         assertGt(lockManager.positionsNFT().balanceOf(OWNER), 0);
-        // assertGt(weth.balanceOf(USER), startingBalanceUser);
         assertGt(weth.balanceOf(treasuryAddress), startingBalanceTreasury);
         assertGt(address(memeCoin).balance, startingDividends);
         assertEq(memeCoin.balanceOf(address(feeAccount)), 0);

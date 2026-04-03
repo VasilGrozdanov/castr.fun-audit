@@ -28,7 +28,7 @@ contract DeployProject is Script {
         0xBE6D8f0d05cC4be24d5167a3eF062215bE6D18a5;
 
     address public keeperRegistry =
-        address(0x86EFBD0b6736Bed994962f9797049422A3A8E8Ad); //  hardcoded for Eth sepolia
+        address(0xf4bAb6A129164aBa9B113cB96BA4266dF49f8743); //  hardcoded for Base mainnet
     uint256 public minWaitPeriod = 24 hours;
     address public beneficiary =
         address(0x3b195607a32C41bD613d48BAb5a9a7761022D4C3);

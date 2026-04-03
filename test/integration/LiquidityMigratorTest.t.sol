@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.0;
+pragma solidity >=0.8.22 <0.9.0;
 
 import {Test} from "forge-std/Test.sol";
 import {DeployProject} from "script/DeployProject.s.sol";
@@ -47,17 +47,6 @@ contract LiquidityMigratorTest is Test {
         feeAccount = FeeAccount(payable(liquidityMigrator.getFeeAccount()));
         vm.deal(USER, 10 ether);
     }
-
-    // function testGetSelectors() external {
-    //     assertNotEq(IBondingCurvesStorage.Buy.selector, "");
-    //     assertNotEq(IBondingCurvesStorage.Sell.selector, "");
-    //     assertNotEq(IBondingCurvesStorage.NewBondingCurveCreated.selector, "");
-    //     assertNotEq(IBondingCurvesStorage.NewKingOfTheCasts.selector, "");
-    //     assertNotEq(ILiquidityMigrator.PoolMigrated.selector, "");
-    //     assertNotEq(IFeeAccount.NewLockManagerAndNFT.selector, "");
-    //     assertNotEq(IFeeAccount.Rewarded.selector, "");
-    //     assertNotEq(SoulboundNFT.Minted.selector, "");
-    // }
 
     function _createBondingCurve(
         string memory name,

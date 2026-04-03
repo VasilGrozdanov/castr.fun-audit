@@ -32,7 +32,7 @@ contract RewardResolver is
     uint256 private constant GRACE_PERIOD_TIME = 12 hours;
     uint256 private constant REWARD_INTERVAL = 24 hours;
     address private constant ROUTER_ADDRESS =
-        0xb83E47C2bC239B3bf370bc41e1459A34b41238D0; //SEPOLIA ETH
+        0xf9B8fc078197181C841c296C876945aaa425B278; //BASE ETH
     uint256 public s_lastTimestamp;
     State private s_state;
 
@@ -46,7 +46,7 @@ contract RewardResolver is
     uint64 private s_subscriptionId;
     // donID - Hardcoded for Sepolia
     bytes32 private constant DON_ID =
-        0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000;
+        0x66756e2d626173652d6d61696e6e65742d310000000000000000000000000000; //BASE ETH
     IFunctionsRouter private s_router;
     bytes public s_lastResponse;
     bytes32 public s_lastRequestId;

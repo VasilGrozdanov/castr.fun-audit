@@ -87,7 +87,6 @@ contract BurnableTokenTest is Test {
         feeAccount.collectFeesAndDistribute(payable(address(burnableToken)));
 
         assertGt(weth.balanceOf(feeAccount.treasury()), 0);
-        // assertGt(weth.balanceOf(CALLER), 0);
     }
 
     function testBurnDoesntAffectDividends() external {
@@ -393,13 +392,6 @@ contract BurnableTokenTest is Test {
         vm.stopPrank();
 
         assertGt(burnableToken.getVestedAmount(USER2), transferAmount);
-
-        // vm.startPrank(USER2);
-        // burnableToken.burn(
-        //     burnableToken.balanceOf(USER2) -
-        //         burnableToken.getVestedAmount(USER2)
-        // );
-        // vm.stopPrank();
 
         assertEq(
             burnableToken.balanceOf(USER2),
